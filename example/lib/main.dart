@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_tree/flutter_tree.dart';
 
 void main() {
@@ -28,6 +31,121 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List treeListData = [];
+
+  List initialTreeData = [
+    {
+      "subject": 3,
+      "exams": null,
+      "parentId": 6,
+      "knowledgeNo": "2",
+      "knowledgeName": "Atomic Structure",
+      "examPaperData": null,
+      "id": 1009,
+      "level": 2,
+    },
+    {
+      "subject": 3,
+      "exams": null,
+      "parentId": 6,
+      "knowledgeNo": "9",
+      "knowledgeName": "Redox Chemistry",
+      "examPaperData": null,
+      "id": 1016,
+      "level": 2,
+    },
+    {
+      "subject": 3,
+      "exams": null,
+      "parentId": 6,
+      "knowledgeNo": "11",
+      "knowledgeName": "Nitrogen and sulfur",
+      "examPaperData": null,
+      "id": 1024,
+      "level": 2,
+    },
+    {
+      "subject": 3,
+      "exams": null,
+      "parentId": 1140,
+      "knowledgeNo": "3.2.1",
+      "knowledgeName": "formation of ions and the dot-and-cross diagram of ionic compound",
+      "examPaperData": null,
+      "id": 1685,
+      "level": 4
+    },
+    {
+      "subject": 3,
+      "exams": null,
+      "parentId": 1140,
+      "knowledgeNo": "3.2.2",
+      "knowledgeName": "evidence for the existence of ions",
+      "examPaperData": null,
+      "id": 1686,
+      "level": 4,
+    },
+    {
+      "subject": 3,
+      "exams": null,
+      "parentId": 1140,
+      "knowledgeNo": "3.2.4",
+      "knowledgeName": "definition of ionic bonding",
+      "examPaperData": null,
+      "id": 1688,
+      "level": 4,
+    },
+    {
+      "subject": 3,
+      "exams": null,
+      "parentId": 1140,
+      "knowledgeNo": "3.2.8",
+      "knowledgeName": "polarisation of ionic compounds",
+      "examPaperData": null,
+      "id": 1692,
+      "level": 4,
+    },
+    {
+      "subject": 3,
+      "exams": null,
+      "parentId": 1142,
+      "knowledgeNo": "3.3.3",
+      "knowledgeName": "dative covalent bond",
+      "examPaperData": null,
+      "id": 1695,
+      "level": 4,
+    },
+    {
+      "subject": 3,
+      "exams": null,
+      "parentId": 1142,
+      "knowledgeNo": "3.3.5",
+      "knowledgeName": "electronegativity and polarity of bond",
+      "examPaperData": null,
+      "id": 1697,
+      "level": 4,
+    },
+    {
+      "subject": 3,
+      "exams": null,
+      "parentId": 1142,
+      "knowledgeNo": "3.3.6",
+      "knowledgeName": "(continuum of bonding type from perfect ionic to non-polar covalent bond)",
+      "examPaperData": null,
+      "id": 1698,
+      "level": 4
+    },
+    {
+      "subject": 3,
+      "exams": null,
+      "parentId": 1142,
+      "knowledgeNo": "3.3.7",
+      "knowledgeName": "electron-pair repulsion theory and shape of molecules",
+      "examPaperData": null,
+      "id": 1699,
+      "level": 4,
+    }
+  ];
+
   Map<String, dynamic> treeData = {
     "id": 0,
     "value": 0,
@@ -90,12 +208,31 @@ class _MyHomePageState extends State<MyHomePage> {
   };
 
   @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  loadData() async {
+    var response = await rootBundle.loadString('assets/data.json');
+    setState(() {
+      treeListData.addAll(json.decode(response)['knowledges']);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: FlutterTree(treeData: treeData),
+      body: treeListData.isNotEmpty
+          ? FlutterTree(
+              initialTreeData: initialTreeData,
+              treeData: treeListData,
+              config: Config(parentId: 'parentId', dataType: DataType.DataList, label: 'knowledgeName'),
+            )
+          : CircularProgressIndicator(),
     );
   }
 }

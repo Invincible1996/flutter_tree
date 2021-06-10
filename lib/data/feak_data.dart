@@ -348,3 +348,38 @@ List treeListData = [
     "level": 2
   },
 ];
+
+List formatList = [
+  {
+    "subject": 3,
+    "exams": [1],
+    "parentId": 0,
+    "knowledgeNo": "",
+    "knowledgeName": "化学A-level知识点树",
+    "examPaperData": null,
+    "id": 6,
+    "level": 1,
+    "children": [
+      {
+        "subject": 3,
+        "exams": [1],
+        "parentId": 6,
+        "knowledgeNo": "31",
+        "knowledgeName": "Measurement data processing",
+        "examPaperData": null,
+        "id": 1101,
+        "level": 2
+      },
+      {
+        "subject": 3,
+        "exams": [1],
+        "parentId": 6,
+        "knowledgeNo": "32",
+        "knowledgeName": "Protein",
+        "examPaperData": null,
+        "id": 1103,
+        "level": 2
+      },
+    ]
+  },
+];

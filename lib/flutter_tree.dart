@@ -1,15 +1,58 @@
 library packages;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_tree/data/feak_data.dart';
-import 'package:flutter_tree/model/tree_data_model.dart';
-import 'package:flutter_tree/model/tree_list_data_model.dart';
+import 'package:flutter_tree/utils/data_util.dart';
 import 'package:flutter_tree/utils/util.dart';
+import 'package:logger/logger.dart';
+
+enum DataType {
+  DataList,
+  DataMap,
+}
+
+class Config {
+  ///数据类型
+
+  DataType dataType;
+
+  ///父级id key
+  String parentId;
+
+  ///value key
+  String value;
+
+  ///
+  String label;
+
+  ///
+  String id;
+
+  ///
+  String children;
+
+  Config({
+    this.dataType = DataType.DataMap,
+    this.parentId = 'parentId',
+    this.value = 'value',
+    this.label = 'label',
+    this.id = 'id',
+    this.children = 'children',
+  });
+}
+
+var logger = Logger();
 
 class FlutterTree extends StatefulWidget {
-  final Map<String, dynamic> treeData;
+  final treeData;
+  final initialTreeData;
+  final Config config;
 
-  const FlutterTree({Key? key, required this.treeData}) : super(key: key);
+  const FlutterTree({
+    Key? key,
+    required this.treeData,
+    required this.initialTreeData,
+    required this.config,
+  }) : super(key: key);
 
   @override
   _FlutterTreeState createState() => _FlutterTreeState();
@@ -17,7 +60,7 @@ class FlutterTree extends StatefulWidget {
 
 class _FlutterTreeState extends State<FlutterTree> {
   ///
-  TreeDataModel treeModel = TreeDataModel();
+  Map<String, dynamic> sourceTreeMap = {};
 
   ///
   bool checkedBox = false;
@@ -35,141 +78,158 @@ class _FlutterTreeState extends State<FlutterTree> {
   /// 展开树形结构
   Map treeMap = {};
 
-  Map treeData = {};
+  Map<String, dynamic> treeData = {};
 
   ///
   List treeList = [];
 
+  List checkedTreeList = [];
+
   @override
   initState() {
     super.initState();
-    treeModel = TreeDataModel.fromJson(widget.treeData);
-    factoryTreeData(treeModel);
-    factoryListData();
-  }
 
-  /// @params
-  /// @desc List结构转化成树形结构
-  factoryListData() {
-    List<TreeListDataModel> newList = [];
-    TreeListDataModel treeDataModel = TreeListDataModel();
-    Map obj = {};
-    int? rootId;
-    treeListData.forEach((element) {
-      newList.add(TreeListDataModel.fromJson(element));
-    });
-
-    print(newList);
-
-    newList.forEach((element) {
-      if (element.parentId != 0) {
-      } else {
-        // parenId 为0 设为根节点
-        // treeDataModel.parentId = element.parentId;
-      }
-    });
-
-    treeListData.forEach((v) {
-      // 根节点
-      if (v['parentId'] != 0) {
-        if (obj[v['parentId']] != null) {
-          if (obj[v['parentId']]['children'] != null) {
-            obj[v['parentId']]['children'].add(v);
-          } else {
-            obj[v['parentId']]['children'] = [v];
-          }
-        } else {
-          obj[v['parentId']] = {
-            "children": [v],
-          };
-        }
-      } else {
-        rootId = v['id'];
-      }
-      if (obj[v['id']] != null) {
-        v['children'] = obj[v['id']]['children'];
-      }
-      obj[v['id']] = v;
-    });
-
-    setState(() {
-      treeData = obj[rootId];
-    });
-    print(treeData);
+    // set default select
+    if (widget.config.dataType == DataType.DataList) {
+      treeList = widget.treeData;
+      checkedTreeList = widget.initialTreeData;
+      var listToMap = DataUtil.transformListToMap(widget.treeData, widget.config);
+      // logger.i(listToMap);
+      setState(() {
+        sourceTreeMap = listToMap;
+      });
+      factoryTreeData(sourceTreeMap, 1);
+      var listToMap2 = DataUtil.transformListToMap(widget.initialTreeData, widget.config);
+      // logger.i(listToMap2);
+      factoryTreeData(listToMap2, 2);
+      // selectCheckedBox(listToMap2);
+    } else {
+      sourceTreeMap = widget.treeData;
+    }
   }
 
   /// @params
   /// @desc 将树形结构数据平铺开
-  factoryTreeData(TreeDataModel treeModel) {
-    (treeModel.children ?? []).forEach((element) {
-      treeMap.putIfAbsent(element.id, () => element);
-      factoryTreeData(element);
+  factoryTreeData(treeModel, type) {
+    treeModel['open'] = false;
+    treeModel['checked'] = type == 1 ? 0 : 2;
+    treeMap.putIfAbsent(treeModel[widget.config.id], () => treeModel);
+    (treeModel[widget.config.children] ?? []).forEach((element) {
+      factoryTreeData(element, type);
     });
   }
 
   /// @params
   /// @desc
-  buildTreeParent() {}
+  buildTreeParent() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () => onOpenNode(sourceTreeMap),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.only(left: 20, top: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    (sourceTreeMap[widget.config.children] ?? []).isNotEmpty
+                        ? Icon(
+                            (sourceTreeMap['open'] ?? false) ? Icons.keyboard_arrow_down_rounded : Icons.keyboard_arrow_right,
+                            size: 20,
+                          )
+                        : SizedBox.shrink(),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        selectCheckedBox(sourceTreeMap);
+                      },
+                      child: buildCheckBoxIcon(sourceTreeMap),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                      child: Text(
+                        '${sourceTreeMap[widget.config.label]}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+                (sourceTreeMap['open'] ?? false)
+                    ? Column(
+                        children: buildTreeNode(sourceTreeMap),
+                      )
+                    : SizedBox.shrink(),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
   /// @params
   /// @desc
-  buildTreeNode(TreeDataModel data) {
-    return (data.children ?? [])
-        .map<Widget>(
-          (e) => GestureDetector(
-            onTap: () => onOpenNode(e),
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.only(left: 20, top: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      (e.children ?? []).isNotEmpty
-                          ? Icon(
-                              e.open! ? Icons.keyboard_arrow_down_rounded : Icons.keyboard_arrow_right,
-                              size: 20,
-                            )
-                          : SizedBox.shrink(),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          selectCheckedBox(e);
-                        },
-                        // child: Icon(
-                        //   buildCheckBoxIcon(e),
-                        //   color: Colors.lightGreen,
-                        //   size: 20,
-                        // ),
-                        child: buildCheckBoxIcon(e),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        '${e.label}',
+  buildTreeNode(Map<String, dynamic> data) {
+    return (data[widget.config.children] ?? []).map<Widget>(
+      (e) {
+        // logger.v(e);
+        return GestureDetector(
+          onTap: () => onOpenNode(e),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.only(left: 20, top: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    (e[widget.config.children] ?? []).isNotEmpty
+                        ? Icon(
+                            (e['open'] ?? false) ? Icons.keyboard_arrow_down_rounded : Icons.keyboard_arrow_right,
+                            size: 20,
+                          )
+                        : SizedBox.shrink(),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        selectCheckedBox(e);
+                      },
+                      child: buildCheckBoxIcon(e),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                      child: Text(
+                        '${e[widget.config.label]}',
                         style: TextStyle(fontSize: 16),
                       ),
-                    ],
-                  ),
-                  e.open!
-                      ? Column(
-                          children: buildTreeNode(e),
-                        )
-                      : SizedBox.shrink(),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+                (e['open'] ?? false)
+                    ? Column(
+                        children: buildTreeNode(e),
+                      )
+                    : SizedBox.shrink(),
+              ],
             ),
           ),
-        )
-        .toList();
+        );
+      },
+    ).toList();
   }
 
-  Icon buildCheckBoxIcon(TreeDataModel e) {
-    switch (e.checked) {
+  Icon buildCheckBoxIcon(Map<String, dynamic> e) {
+    switch (e['checked'] ?? 0) {
       case 0:
         return Icon(
           Icons.check_box_outline_blank,
@@ -192,50 +252,50 @@ class _FlutterTreeState extends State<FlutterTree> {
 
   /// @params
   /// @desc
-  onOpenNode(TreeDataModel model) {
-    if ((model.children ?? []).isEmpty) return;
-    model.open = !model.open!;
+  onOpenNode(Map<String, dynamic> model) {
+    if ((model[widget.config.children] ?? []).isEmpty) return;
+    model['open'] = !model['open'];
     setState(() {
-      treeModel = treeModel;
+      sourceTreeMap = sourceTreeMap;
     });
   }
 
   /// @params
   /// @desc
-  selectNode(TreeDataModel dataModel) {
+  selectNode(Map<String, dynamic> dataModel) {
     setState(() {
-      selectValue = dataModel.value!;
+      selectValue = dataModel['value']!;
     });
   }
 
   /// @params
   /// @desc
-  selectCheckedBox(TreeDataModel dataModel) {
-    int checked = dataModel.checked!;
-    if ((dataModel.children ?? []).isNotEmpty) {
+  selectCheckedBox(Map<String, dynamic> dataModel) {
+    int checked = dataModel['checked']!;
+    if ((dataModel[widget.config.children] ?? []).isNotEmpty) {
       var stack = MStack();
       stack.push(dataModel);
       while (stack.top > 0) {
-        TreeDataModel node = stack.pop();
-        for (var item in node.children ?? []) {
+        Map<String, dynamic> node = stack.pop();
+        for (var item in node[widget.config.children] ?? []) {
           stack.push(item);
         }
         if (checked == 2) {
-          node.checked = 0;
+          node['checked'] = 0;
         } else {
-          node.checked = 2;
+          node['checked'] = 2;
         }
       }
     } else {
       if (checked == 2) {
-        dataModel.checked = 0;
+        dataModel['checked'] = 0;
       } else {
-        dataModel.checked = 2;
+        dataModel['checked'] = 2;
       }
     }
 
     // 父节点
-    if (dataModel.pid! > 0 || dataModel.pid == 0) {
+    if (dataModel[widget.config.parentId]! >= 0) {
       updateParentNode(dataModel);
     } else {}
     getCheckedItems();
@@ -245,48 +305,47 @@ class _FlutterTreeState extends State<FlutterTree> {
   getCheckedItems() {
     var stack = MStack();
     var checkedList = [];
-    stack.push(treeModel);
+    stack.push(sourceTreeMap);
     while (stack.top > 0) {
       var node = stack.pop();
-      for (var item in (node.children ?? [])) {
+      for (var item in (node[widget.config.children] ?? [])) {
         stack.push(item);
       }
-      if (node.checked == 2) {
-        checkedList.add(node.value);
+      if (node['checked'] == 2) {
+        checkedList.add(node['value']);
       }
     }
   }
 
   /// @params
   /// @desc
-  updateParentNode(TreeDataModel dataModel) {
-    var par = treeMap[dataModel.pid];
+  updateParentNode(Map<String, dynamic> dataModel) {
+    var par = treeMap[dataModel[widget.config.parentId]];
     if (par == null) return;
     int checkLen = 0;
     bool partChecked = false;
-    for (var item in (par.children ?? [])) {
-      if (item.checked == 2) {
+    for (var item in (par[widget.config.children] ?? [])) {
+      if (item['checked'] == 2) {
         checkLen++;
-      } else if (item.checked == 1) {
+      } else if (item['checked'] == 1) {
         partChecked = true;
         break;
       }
     }
 
     // 如果子孩子全都是选择的， 父节点就全选
-    if (checkLen == (par.children ?? []).length) {
-      par.checked = 2;
-    } else if (partChecked || (checkLen < (par.children ?? []).length && checkLen > 0)) {
-      par.checked = 1;
+    if (checkLen == (par[widget.config.children] ?? []).length) {
+      par['checked'] = 2;
+    } else if (partChecked || (checkLen < (par[widget.config.children] ?? []).length && checkLen > 0)) {
+      par['checked'] = 1;
     } else {
-      par.checked = 0;
+      par['checked'] = 0;
     }
 
     // 如果还有父节点 解析往上更新
-    if (treeMap[par.pid] != null || treeMap[par.pid] == 0) {
+    if (treeMap[par[widget.config.parentId]] != null || treeMap[par[widget.config.parentId]] == 0) {
       updateParentNode(par);
     } else {}
-
     setState(() {});
   }
 
@@ -294,8 +353,8 @@ class _FlutterTreeState extends State<FlutterTree> {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      child: ListView(
-        children: buildTreeNode(treeModel),
+      child: SingleChildScrollView(
+        child: buildTreeParent(),
       ),
     );
   }
