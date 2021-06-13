@@ -31,9 +31,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List treeListData = [];
+  List<Map<String, dynamic>> treeListData = [];
 
-  List initialTreeData = [
+  List<Map<String, dynamic>> initialTreeData = [
     {
       "subject": 3,
       "exams": null,
@@ -216,7 +216,10 @@ class _MyHomePageState extends State<MyHomePage> {
   loadData() async {
     var response = await rootBundle.loadString('assets/data.json');
     setState(() {
-      treeListData.addAll(json.decode(response)['knowledges']);
+      json.decode(response)['knowledges'].forEach((item) {
+        treeListData.add(item);
+        print(item);
+      });
     });
   }
 
@@ -228,8 +231,8 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: treeListData.isNotEmpty
           ? FlutterTree(
-              initialTreeData: initialTreeData,
-              treeData: treeListData,
+              listData: treeListData,
+              initialListData: initialTreeData,
               config: Config(parentId: 'parentId', dataType: DataType.DataList, label: 'knowledgeName'),
             )
           : CircularProgressIndicator(),
