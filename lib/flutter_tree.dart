@@ -337,11 +337,10 @@ class _FlutterTreeState extends State<FlutterTree> {
         stack.push(item);
       }
       if (node['checked'] == 2) {
-        /// 如果当前选中的
         checkedList.add(node);
       }
     }
-    logger.v(checkedList);
+    // logger.v(checkedList);
     // var filterChildrenList = checkedList.where((element) => ((element['children'] ?? []).isNotEmpty)).toList();
     // var filterNoChildrenList = checkedList.where((element) => ((element['children'] ?? []).isEmpty)).toList();
     // var newList = [];

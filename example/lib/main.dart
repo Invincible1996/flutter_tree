@@ -3,6 +3,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tree/flutter_tree.dart';
+import 'package:logger/logger.dart';
+
+final logger = Logger(
+  printer: PrettyPrinter(
+      methodCount: 2, // number of method calls to be displayed
+      errorMethodCount: 8, // number of method calls if stacktrace is provided
+      lineLength: 120, // width of the output
+      colors: true, // Colorful log messages
+      printEmojis: false, // Print an emoji for each log message
+      printTime: false // Should each log print contain a timestamp
+      ),
+);
 
 void main() {
   runApp(MyApp());
@@ -211,11 +223,169 @@ class _MyHomePageState extends State<MyHomePage> {
     {
       "subject": 3,
       "exams": [1],
-      "parentId": 1130,
-      "knowledgeNo": "2.2.3",
-      "knowledgeName": "relative masses of atoms and molecules",
+      "parentId": 1010,
+      "knowledgeNo": "3.1",
+      "knowledgeName": "metallic bonding",
       "examPaperData": null,
-      "id": 1665,
+      "id": 1138,
+      "level": 3,
+      "children": [
+        {
+          "subject": 3,
+          "exams": [1],
+          "parentId": 1138,
+          "knowledgeNo": "3.1.1",
+          "knowledgeName": "structure of metals",
+          "examPaperData": null,
+          "id": 1680,
+          "level": 4,
+          "open": false,
+          "checked": 2
+        },
+        {
+          "subject": 3,
+          "exams": [1],
+          "parentId": 1138,
+          "knowledgeNo": "3.1.2",
+          "knowledgeName": "definition of metallic bonding",
+          "examPaperData": null,
+          "id": 1681,
+          "level": 4,
+          "open": false,
+          "checked": 2
+        },
+        {
+          "subject": 3,
+          "exams": [1],
+          "parentId": 1138,
+          "knowledgeNo": "3.1.3",
+          "knowledgeName": "properties of metals",
+          "examPaperData": null,
+          "id": 1682,
+          "level": 4,
+          "open": false,
+          "checked": 2
+        },
+        {
+          "subject": 3,
+          "exams": [1],
+          "parentId": 1138,
+          "knowledgeNo": "3.1.4",
+          "knowledgeName": "comparing the melting point of metals",
+          "examPaperData": null,
+          "id": 1683,
+          "level": 4,
+          "open": false,
+          "checked": 2
+        },
+        {
+          "subject": 3,
+          "exams": [1],
+          "parentId": 1138,
+          "knowledgeNo": "3.1.5",
+          "knowledgeName": "comparing the conductivity of metals",
+          "examPaperData": null,
+          "id": 1684,
+          "level": 4,
+          "open": false,
+          "checked": 2
+        }
+      ],
+      "open": true,
+      "checked": 2
+    },
+    {
+      "subject": 3,
+      "exams": [1],
+      "parentId": 1138,
+      "knowledgeNo": "3.1.5",
+      "knowledgeName": "comparing the conductivity of metals",
+      "examPaperData": null,
+      "id": 1684,
+      "level": 4,
+      "open": false,
+      "checked": 2
+    },
+    {
+      "subject": 3,
+      "exams": [1],
+      "parentId": 1138,
+      "knowledgeNo": "3.1.4",
+      "knowledgeName": "comparing the melting point of metals",
+      "examPaperData": null,
+      "id": 1683,
+      "level": 4,
+      "open": false,
+      "checked": 2
+    },
+    {
+      "subject": 3,
+      "exams": [1],
+      "parentId": 1138,
+      "knowledgeNo": "3.1.3",
+      "knowledgeName": "properties of metals",
+      "examPaperData": null,
+      "id": 1682,
+      "level": 4,
+      "open": false,
+      "checked": 2
+    },
+    {
+      "subject": 3,
+      "exams": [1],
+      "parentId": 1138,
+      "knowledgeNo": "3.1.2",
+      "knowledgeName": "definition of metallic bonding",
+      "examPaperData": null,
+      "id": 1681,
+      "level": 4,
+      "open": false,
+      "checked": 2
+    },
+    {
+      "subject": 3,
+      "exams": [1],
+      "parentId": 1138,
+      "knowledgeNo": "3.1.1",
+      "knowledgeName": "structure of metals",
+      "examPaperData": null,
+      "id": 1680,
+      "level": 4,
+      "open": false,
+      "checked": 2
+    },
+    {
+      "subject": 3,
+      "exams": [1],
+      "parentId": 1132,
+      "knowledgeNo": "2.3.5",
+      "knowledgeName": "application of mass spectroscopy",
+      "examPaperData": null,
+      "id": 1670,
+      "level": 4,
+      "open": false,
+      "checked": 2
+    },
+    {
+      "subject": 3,
+      "exams": [1],
+      "parentId": 1132,
+      "knowledgeNo": "2.3.4",
+      "knowledgeName": "peaks of ions with 2+ charge in mass spectrum",
+      "examPaperData": null,
+      "id": 1669,
+      "level": 4,
+      "open": false,
+      "checked": 2
+    },
+    {
+      "subject": 3,
+      "exams": [1],
+      "parentId": 1132,
+      "knowledgeNo": "2.3.3",
+      "knowledgeName": "interpret mass spectra of simple molecules (eg. halogens)",
+      "examPaperData": null,
+      "id": 1668,
       "level": 4,
       "open": false,
       "checked": 2
@@ -224,10 +394,10 @@ class _MyHomePageState extends State<MyHomePage> {
       "subject": 3,
       "exams": [1],
       "parentId": 1130,
-      "knowledgeNo": "2.2.2",
-      "knowledgeName": "radioactive isotopes",
+      "knowledgeNo": "2.2.3",
+      "knowledgeName": "relative masses of atoms and molecules",
       "examPaperData": null,
-      "id": 1664,
+      "id": 1665,
       "level": 4,
       "open": false,
       "checked": 2
@@ -255,7 +425,7 @@ class _MyHomePageState extends State<MyHomePage> {
           "checked": 2
         }
       ],
-      "open": true,
+      "open": false,
       "checked": 2
     },
     {
@@ -286,7 +456,33 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     print(newListNoChildren.length);
     print(newList.length);
-    print(newList);
+    // print(newList);
+    List<Map<String, dynamic>> mList = [];
+
+    List<int> idList = [];
+
+    var sum = 0;
+    for (var value in newListNoChildren) {
+      for (var value1 in newList) {
+        sum += 1;
+        // logger.v(value1);
+        // if (value['id'] != value1['parentId'] && !idList.contains(value1['id'])) {
+        // print(value['id']);
+        // logger.e(value);
+        // logger.v(value1);
+        idList.add(value['id']);
+        mList.add(value1);
+        break;
+        // }
+      }
+    }
+    logger.v(sum);
+    logger.v(idList);
+
+    // logger.v(mList);
+    // newList.addAll(mList);
+
+    logger.v(newList);
   }
 
   loadData() async {
@@ -307,7 +503,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: treeListData.isNotEmpty
           ? FlutterTree(
               listData: treeListData,
-              initialListData: [],
+              initialListData: list,
               config: Config(parentId: 'parentId', dataType: DataType.DataList, label: 'knowledgeName'),
             )
           : CircularProgressIndicator(),
