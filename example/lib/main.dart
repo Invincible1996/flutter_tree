@@ -207,10 +207,86 @@ class _MyHomePageState extends State<MyHomePage> {
     "open": true
   };
 
+  List<Map<String, dynamic>> list = [
+    {
+      "subject": 3,
+      "exams": [1],
+      "parentId": 1130,
+      "knowledgeNo": "2.2.3",
+      "knowledgeName": "relative masses of atoms and molecules",
+      "examPaperData": null,
+      "id": 1665,
+      "level": 4,
+      "open": false,
+      "checked": 2
+    },
+    {
+      "subject": 3,
+      "exams": [1],
+      "parentId": 1130,
+      "knowledgeNo": "2.2.2",
+      "knowledgeName": "radioactive isotopes",
+      "examPaperData": null,
+      "id": 1664,
+      "level": 4,
+      "open": false,
+      "checked": 2
+    },
+    {
+      "subject": 3,
+      "exams": [1],
+      "parentId": 1009,
+      "knowledgeNo": "2.1",
+      "knowledgeName": "sub-atomic particles",
+      "examPaperData": null,
+      "id": 1125,
+      "level": 3,
+      "children": [
+        {
+          "subject": 3,
+          "exams": [1],
+          "parentId": 1125,
+          "knowledgeNo": "2.1.1",
+          "knowledgeName": "particles in the atom",
+          "examPaperData": null,
+          "id": 1662,
+          "level": 4,
+          "open": false,
+          "checked": 2
+        }
+      ],
+      "open": true,
+      "checked": 2
+    },
+    {
+      "subject": 3,
+      "exams": [1],
+      "parentId": 1125,
+      "knowledgeNo": "2.1.1",
+      "knowledgeName": "particles in the atom",
+      "examPaperData": null,
+      "id": 1662,
+      "level": 4,
+      "open": false,
+      "checked": 2
+    }
+  ];
+
   @override
   void initState() {
     super.initState();
     loadData();
+    print(list.length);
+    var newList = list.where((element) => (element['children'] ?? []).isNotEmpty).toList();
+    var newListNoChildren = list.where((element) => (element['children'] ?? []).isEmpty).toList();
+    newList.forEach((element) {
+      if ((element['children'] ?? []).isNotEmpty) {
+        element.remove('children');
+      }
+    });
+    print(newListNoChildren.length);
+    print(newList.length);
+    print(newList);
   }
 
   loadData() async {
@@ -218,7 +294,6 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       json.decode(response)['knowledges'].forEach((item) {
         treeListData.add(item);
-        print(item);
       });
     });
   }
@@ -232,7 +307,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: treeListData.isNotEmpty
           ? FlutterTree(
               listData: treeListData,
-              initialListData: initialTreeData,
+              initialListData: [],
               config: Config(parentId: 'parentId', dataType: DataType.DataList, label: 'knowledgeName'),
             )
           : CircularProgressIndicator(),

@@ -43,19 +43,19 @@ class Config {
 var logger = Logger();
 
 class FlutterTree extends StatefulWidget {
-  ///
+  /// source data type Map
   final Map<String, dynamic> treeData;
 
-  ///
+  ///  source data type List
   final List<Map<String, dynamic>> listData;
 
-  ///
+  ///  initial source data type Map
   final Map<String, dynamic> initialTreeData;
 
-  ///
+  ///  initial source data type List
   final List<Map<String, dynamic>> initialListData;
 
-  ///
+  ///  Config
   final Config config;
 
   FlutterTree({
@@ -88,541 +88,37 @@ class _FlutterTreeState extends State<FlutterTree> {
     2: 'checked',
   };
 
-  /// 展开树形结构
+  /// @params
+  /// @desc expand map tree to map
   Map treeMap = {};
-
-  Map<String, dynamic> treeData = {};
-
-  ///
-  List treeList = [];
-
-  List checkedTreeList = [];
-
-  // Map<String, dynamic> testMap = {
-  //   "subject": 3,
-  //   "exams": [1],
-  //   "parentId": 6,
-  //   "knowledgeNo": "7",
-  //   "knowledgeName": "Equilibria",
-  //   "examPaperData": null,
-  //   "id": 1014,
-  //   "level": 2,
-  //   "children": [
-  //     {
-  //       "subject": 3,
-  //       "exams": [1],
-  //       "parentId": 1014,
-  //       "knowledgeNo": "7.1",
-  //       "knowledgeName": "Le Chatelier Principle",
-  //       "examPaperData": null,
-  //       "id": 1166,
-  //       "level": 3,
-  //       "children": [
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1166,
-  //           "knowledgeNo": "7.1.1",
-  //           "knowledgeName": "concept of dynamics equilibrium",
-  //           "examPaperData": null,
-  //           "id": 1722,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1166,
-  //           "knowledgeNo": "7.1.2",
-  //           "knowledgeName": "explain the qualitative effects of changes of temperature, pressure and concentration on the position of equilibrium",
-  //           "examPaperData": null,
-  //           "id": 1723,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1166,
-  //           "knowledgeNo": "7.1.3",
-  //           "knowledgeName": "explain the necessity to reach a compromise between the yield and the rate for industrial processes",
-  //           "examPaperData": null,
-  //           "id": 1724,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         }
-  //       ],
-  //       "open": false,
-  //       "checked": 0
-  //     },
-  //     {
-  //       "subject": 3,
-  //       "exams": [1],
-  //       "parentId": 1014,
-  //       "knowledgeNo": "7.2",
-  //       "knowledgeName": "equilibrium constant",
-  //       "examPaperData": null,
-  //       "id": 1169,
-  //       "level": 3,
-  //       "children": [
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1169,
-  //           "knowledgeNo": "7.2.1",
-  //           "knowledgeName": "expression of Kc for homogeneous system",
-  //           "examPaperData": null,
-  //           "id": 1725,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1169,
-  //           "knowledgeNo": "7.2.2",
-  //           "knowledgeName": "activity series ranks metals according to the ease with which ther undergo oxidation",
-  //           "examPaperData": null,
-  //           "id": 1726,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1169,
-  //           "knowledgeNo": "7.2.3",
-  //           "knowledgeName": "expression of Kp for homogeneous and heterogeneous systems",
-  //           "examPaperData": null,
-  //           "id": 1727,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1169,
-  //           "knowledgeNo": "7.2.4",
-  //           "knowledgeName": "calculating the value of Kc",
-  //           "examPaperData": null,
-  //           "id": 1728,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1169,
-  //           "knowledgeNo": "7.2.5",
-  //           "knowledgeName": "calculating the value of Kp",
-  //           "examPaperData": null,
-  //           "id": 1729,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1169,
-  //           "knowledgeNo": "7.2.6",
-  //           "knowledgeName": "effect of change in temperation on the Kc value",
-  //           "examPaperData": null,
-  //           "id": 1730,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         }
-  //       ],
-  //       "open": false,
-  //       "checked": 0
-  //     },
-  //     {
-  //       "subject": 3,
-  //       "exams": [1],
-  //       "parentId": 1014,
-  //       "knowledgeNo": "7.3",
-  //       "knowledgeName": "acid and base",
-  //       "examPaperData": null,
-  //       "id": 1171,
-  //       "level": 3,
-  //       "children": [
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1171,
-  //           "knowledgeNo": "7.3.1",
-  //           "knowledgeName": "Bronsted-Lowry theory of acids and bases",
-  //           "examPaperData": null,
-  //           "id": 1731,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1171,
-  //           "knowledgeNo": "7.3.2",
-  //           "knowledgeName": "conjugate acid and base pair",
-  //           "examPaperData": null,
-  //           "id": 1732,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1171,
-  //           "knowledgeNo": "7.3.3",
-  //           "knowledgeName": "strong and weak acid/base",
-  //           "examPaperData": null,
-  //           "id": 1733,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         }
-  //       ],
-  //       "open": false,
-  //       "checked": 0
-  //     }
-  //   ],
-  //   "open": false,
-  //   "checked": 0
-  // };
-  // Map<String, dynamic> testMap2 = {
-  //   "subject": 3,
-  //   "exams": [1],
-  //   "parentId": 6,
-  //   "knowledgeNo": "8",
-  //   "knowledgeName": "Periodicity",
-  //   "examPaperData": null,
-  //   "id": 1015,
-  //   "level": 2,
-  //   "children": [
-  //     {
-  //       "subject": 3,
-  //       "exams": [1],
-  //       "parentId": 1015,
-  //       "knowledgeNo": "8.1",
-  //       "knowledgeName": "physical Trends",
-  //       "examPaperData": null,
-  //       "id": 1172,
-  //       "level": 3,
-  //       "children": [
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1172,
-  //           "knowledgeNo": "8.1.1",
-  //           "knowledgeName": "periodicity",
-  //           "examPaperData": null,
-  //           "id": 1734,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1172,
-  //           "knowledgeNo": "8.1.2",
-  //           "knowledgeName": "trends of electronegativity, IE, conductivity, radius, mp across the period 2 and 3",
-  //           "examPaperData": null,
-  //           "id": 1735,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         }
-  //       ],
-  //       "open": false,
-  //       "checked": 0
-  //     },
-  //     {
-  //       "subject": 3,
-  //       "exams": [1],
-  //       "parentId": 1015,
-  //       "knowledgeNo": "8.2",
-  //       "knowledgeName": "reactions of period 3 elements",
-  //       "examPaperData": null,
-  //       "id": 1173,
-  //       "level": 3,
-  //       "children": [
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1173,
-  //           "knowledgeNo": "8.2.1",
-  //           "knowledgeName": "reaction of the elements with O2 and Cl2",
-  //           "examPaperData": null,
-  //           "id": 1736,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1173,
-  //           "knowledgeNo": "8.2.2",
-  //           "knowledgeName": "variation in oxidation number of the oxides and chlorides",
-  //           "examPaperData": null,
-  //           "id": 1737,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1173,
-  //           "knowledgeNo": "8.2.3",
-  //           "knowledgeName": "reactions of the oxides and hydroxides",
-  //           "examPaperData": null,
-  //           "id": 1738,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1173,
-  //           "knowledgeNo": "8.2.4",
-  //           "knowledgeName": "oxides change from basic through amphoteric to acidic",
-  //           "examPaperData": null,
-  //           "id": 1739,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1173,
-  //           "knowledgeNo": "8.2.5",
-  //           "knowledgeName": "explain and describe the rxn of the chlorides and water",
-  //           "examPaperData": null,
-  //           "id": 1740,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         },
-  //         {
-  //           "subject": 3,
-  //           "exams": [1],
-  //           "parentId": 1173,
-  //           "knowledgeNo": "8.2.6",
-  //           "knowledgeName": "the type of chemical bonding present in chlorides and oxides",
-  //           "examPaperData": null,
-  //           "id": 1741,
-  //           "level": 4,
-  //           "open": false,
-  //           "checked": 0
-  //         }
-  //       ],
-  //       "open": false,
-  //       "checked": 0
-  //     }
-  //   ],
-  //   "open": false,
-  //   "checked": 0
-  // };
-
-  // List initialTreeData = [
-  //   {
-  //     "subject": 3,
-  //     "exams": null,
-  //     "parentId": 6,
-  //     "knowledgeNo": "2",
-  //     "knowledgeName": "Atomic Structure",
-  //     "examPaperData": null,
-  //     "id": 1009,
-  //     "level": 2,
-  //   },
-  //   {
-  //     "subject": 3,
-  //     "exams": null,
-  //     "parentId": 6,
-  //     "knowledgeNo": "9",
-  //     "knowledgeName": "Redox Chemistry",
-  //     "examPaperData": null,
-  //     "id": 1016,
-  //     "level": 2,
-  //   },
-  //   {
-  //     "subject": 3,
-  //     "exams": null,
-  //     "parentId": 6,
-  //     "knowledgeNo": "11",
-  //     "knowledgeName": "Nitrogen and sulfur",
-  //     "examPaperData": null,
-  //     "id": 1024,
-  //     "level": 2,
-  //   },
-  //   {
-  //     "subject": 3,
-  //     "exams": null,
-  //     "parentId": 1140,
-  //     "knowledgeNo": "3.2.1",
-  //     "knowledgeName": "formation of ions and the dot-and-cross diagram of ionic compound",
-  //     "examPaperData": null,
-  //     "id": 1685,
-  //     "level": 4
-  //   },
-  //   {
-  //     "subject": 3,
-  //     "exams": null,
-  //     "parentId": 1140,
-  //     "knowledgeNo": "3.2.2",
-  //     "knowledgeName": "evidence for the existence of ions",
-  //     "examPaperData": null,
-  //     "id": 1686,
-  //     "level": 4,
-  //   },
-  //   {
-  //     "subject": 3,
-  //     "exams": null,
-  //     "parentId": 1140,
-  //     "knowledgeNo": "3.2.4",
-  //     "knowledgeName": "definition of ionic bonding",
-  //     "examPaperData": null,
-  //     "id": 1688,
-  //     "level": 4,
-  //   },
-  //   {
-  //     "subject": 3,
-  //     "exams": null,
-  //     "parentId": 1140,
-  //     "knowledgeNo": "3.2.8",
-  //     "knowledgeName": "polarisation of ionic compounds",
-  //     "examPaperData": null,
-  //     "id": 1692,
-  //     "level": 4,
-  //   },
-  //   {
-  //     "subject": 3,
-  //     "exams": null,
-  //     "parentId": 1142,
-  //     "knowledgeNo": "3.3.3",
-  //     "knowledgeName": "dative covalent bond",
-  //     "examPaperData": null,
-  //     "id": 1695,
-  //     "level": 4,
-  //   },
-  //   {
-  //     "subject": 3,
-  //     "exams": null,
-  //     "parentId": 1142,
-  //     "knowledgeNo": "3.3.5",
-  //     "knowledgeName": "electronegativity and polarity of bond",
-  //     "examPaperData": null,
-  //     "id": 1697,
-  //     "level": 4,
-  //   },
-  //   {
-  //     "subject": 3,
-  //     "exams": null,
-  //     "parentId": 1142,
-  //     "knowledgeNo": "3.3.6",
-  //     "knowledgeName": "(continuum of bonding type from perfect ionic to non-polar covalent bond)",
-  //     "examPaperData": null,
-  //     "id": 1698,
-  //     "level": 4
-  //   },
-  //   {
-  //     "subject": 3,
-  //     "exams": null,
-  //     "parentId": 1142,
-  //     "knowledgeNo": "3.3.7",
-  //     "knowledgeName": "electron-pair repulsion theory and shape of molecules",
-  //     "examPaperData": null,
-  //     "id": 1699,
-  //     "level": 4,
-  //   }
-  // ];
 
   @override
   initState() {
     super.initState();
-
     // set default select
     if (widget.config.dataType == DataType.DataList) {
-      treeList = widget.listData;
-      checkedTreeList = widget.initialListData;
       var listToMap = DataUtil.transformListToMap(widget.listData, widget.config);
       sourceTreeMap = listToMap;
-
       factoryTreeData(sourceTreeMap);
-
-      // Map<String, dynamic> newMap = {};
-      // for (var item in widget.initialTreeData) {
-      //   newMap.putIfAbsent(item['parentId'].toString(), () => item);
-      // }
-      // logger.v(newMap);
-
-      // var newList = newMap.values.toList();
-      // for (var item1 in newList) {
-      //   item1['checked'] = 0;
-      //   item1['children'] = [];
-      //   for (var item2 in widget.initialTreeData) {
-      //     if (item1['id'] == item2['id']) {
-      //       item1['children'].add(item2);
-      //     }
-      //   }
-      // }
-      //
-      // // logger.v(newList[0]);
-      // print(newList);
-      //
-      // newList.forEach((element) {
-      //   print(element['id']);
-      //   print(element['children']);
-      // });
-      // logger.v(testMap);
-      // logger.v(initialTreeData);
-
       widget.initialListData.forEach((element) {
         element['checked'] = 0;
       });
-
       for (var item in widget.initialListData) {
         for (var element in treeMap.values.toList()) {
           if (item['id'] == element['id']) {
-            // element['checked'] = 2;
-            // element['children'].forEach((element2) {
-            //   element2['checked'] = 2;
-            // });
             setCheckStatus(element);
             break;
           }
         }
         selectCheckedBox(item);
       }
-      // for (var element in treeMap.values.toList()) {
-      //   if (testMap2['id'] == element['id']) {
-      //     // element['checked'] = 2;
-      //     // element['children'].forEach((element2) {
-      //     //   element2['checked'] = 2;
-      //     // });
-      //     setCheckStatus(element);
-      //     break;
-      //   }
-      // }
-      // selectCheckedBox(testMap2);
     } else {
       sourceTreeMap = widget.treeData;
     }
   }
 
+  /// @params
+  /// @desc set current item checked
   setCheckStatus(item) {
     item['checked'] = 2;
     if (item['children'] != null) {
@@ -633,7 +129,7 @@ class _FlutterTreeState extends State<FlutterTree> {
   }
 
   /// @params
-  /// @desc 将树形结构数据平铺开
+  /// @desc expand tree data to map
   factoryTreeData(treeModel) {
     treeModel['open'] = false;
     treeModel['checked'] = 0;
@@ -644,7 +140,7 @@ class _FlutterTreeState extends State<FlutterTree> {
   }
 
   /// @params
-  /// @desc
+  /// @desc render parent
   buildTreeParent() {
     return Column(
       children: [
@@ -698,11 +194,10 @@ class _FlutterTreeState extends State<FlutterTree> {
   }
 
   /// @params
-  /// @desc
+  /// @desc render item
   buildTreeNode(Map<String, dynamic> data) {
     return (data[widget.config.children] ?? []).map<Widget>(
       (e) {
-        // logger.v(e);
         return GestureDetector(
           onTap: () => onOpenNode(e),
           child: Container(
@@ -752,6 +247,8 @@ class _FlutterTreeState extends State<FlutterTree> {
     ).toList();
   }
 
+  /// @params
+  /// @desc render icon by checked type
   Icon buildCheckBoxIcon(Map<String, dynamic> e) {
     switch (e['checked'] ?? 0) {
       case 0:
@@ -775,7 +272,7 @@ class _FlutterTreeState extends State<FlutterTree> {
   }
 
   /// @params
-  /// @desc
+  /// @desc expand item if has item has children
   onOpenNode(Map<String, dynamic> model) {
     if ((model[widget.config.children] ?? []).isEmpty) return;
     model['open'] = !model['open'];
@@ -793,9 +290,8 @@ class _FlutterTreeState extends State<FlutterTree> {
   }
 
   /// @params
-  /// @desc
+  /// @desc 选中帅选框
   selectCheckedBox(Map<String, dynamic> dataModel) {
-    logger.v(dataModel);
     int checked = dataModel['checked']!;
     if ((dataModel[widget.config.children] ?? []).isNotEmpty) {
       var stack = MStack();
@@ -822,13 +318,15 @@ class _FlutterTreeState extends State<FlutterTree> {
     // 父节点
     if (dataModel[widget.config.parentId]! > 0) {
       updateParentNode(dataModel);
-    } else {}
+    }
     getCheckedItems();
     setState(() {
       sourceTreeMap = sourceTreeMap;
     });
   }
 
+  /// @params
+  /// @desc 获取选中的条目
   getCheckedItems() {
     var stack = MStack();
     var checkedList = [];
@@ -839,9 +337,27 @@ class _FlutterTreeState extends State<FlutterTree> {
         stack.push(item);
       }
       if (node['checked'] == 2) {
-        checkedList.add(node['value']);
+        /// 如果当前选中的
+        checkedList.add(node);
       }
     }
+    logger.v(checkedList);
+    // var filterChildrenList = checkedList.where((element) => ((element['children'] ?? []).isNotEmpty)).toList();
+    // var filterNoChildrenList = checkedList.where((element) => ((element['children'] ?? []).isEmpty)).toList();
+    // var newList = [];
+    // for (var item1 in filterChildrenList) {
+    //   for (var item2 in filterNoChildrenList) {
+    //     if (item1['id'] != item2['parentId']) {
+    //       newList.add(item2);
+    //       // break;
+    //     }
+    //   }
+    // }
+    // newList.addAll(filterChildrenList);
+    // newList.forEach((element) {
+    //   element['children'] = [];
+    // });
+    // logger.v(newList);
   }
 
   /// @params
@@ -872,10 +388,7 @@ class _FlutterTreeState extends State<FlutterTree> {
     // 如果还有父节点 解析往上更新
     if (treeMap[par[widget.config.parentId]] != null || treeMap[par[widget.config.parentId]] == 0) {
       updateParentNode(par);
-    } else {}
-    // setState(() {
-    //   sourceTreeMap = sourceTreeMap;
-    // });
+    }
   }
 
   @override
