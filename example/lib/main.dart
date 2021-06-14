@@ -7,11 +7,16 @@ import 'package:logger/logger.dart';
 
 final logger = Logger(
   printer: PrettyPrinter(
-      methodCount: 2, // number of method calls to be displayed
-      errorMethodCount: 8, // number of method calls if stacktrace is provided
-      lineLength: 120, // width of the output
-      colors: true, // Colorful log messages
-      printEmojis: false, // Print an emoji for each log message
+      methodCount: 2,
+      // number of method calls to be displayed
+      errorMethodCount: 8,
+      // number of method calls if stacktrace is provided
+      lineLength: 120,
+      // width of the output
+      colors: true,
+      // Colorful log messages
+      printEmojis: false,
+      // Print an emoji for each log message
       printTime: false // Should each log print contain a timestamp
       ),
 );
@@ -447,42 +452,25 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     loadData();
     print(list.length);
-    var newList = list.where((element) => (element['children'] ?? []).isNotEmpty).toList();
-    var newListNoChildren = list.where((element) => (element['children'] ?? []).isEmpty).toList();
-    newList.forEach((element) {
-      if ((element['children'] ?? []).isNotEmpty) {
-        element.remove('children');
-      }
-    });
-    print(newListNoChildren.length);
-    print(newList.length);
-    // print(newList);
-    List<Map<String, dynamic>> mList = [];
-
-    List<int> idList = [];
-
-    var sum = 0;
-    for (var value in newListNoChildren) {
-      for (var value1 in newList) {
-        sum += 1;
-        // logger.v(value1);
-        // if (value['id'] != value1['parentId'] && !idList.contains(value1['id'])) {
-        // print(value['id']);
-        // logger.e(value);
-        // logger.v(value1);
-        idList.add(value['id']);
-        mList.add(value1);
-        break;
-        // }
+    // List中多余的元素
+    var list1 = [];
+    for (var value2 in list) {
+      if (value2['children'] != null && value2['children'].isNotEmpty) {
+        for (var value in list) {
+          // 没有children
+          if (value['children'] == null || value['children'].isEmpty) {
+            if (value2['id'] == value['parentId']) {
+              list1.add(value);
+            }
+          }
+        }
       }
     }
-    logger.v(sum);
-    logger.v(idList);
-
-    // logger.v(mList);
-    // newList.addAll(mList);
-
-    logger.v(newList);
+    // 移除List中多余的元素
+    var set = Set.from(list);
+    var set2 = Set.from(list1);
+    var filterList = List.from(set.difference(set2));
+    logger.v(filterList);
   }
 
   loadData() async {
