@@ -340,23 +340,27 @@ class _FlutterTreeState extends State<FlutterTree> {
         checkedList.add(node);
       }
     }
-    // logger.v(checkedList);
-    // var filterChildrenList = checkedList.where((element) => ((element['children'] ?? []).isNotEmpty)).toList();
-    // var filterNoChildrenList = checkedList.where((element) => ((element['children'] ?? []).isEmpty)).toList();
-    // var newList = [];
-    // for (var item1 in filterChildrenList) {
-    //   for (var item2 in filterNoChildrenList) {
-    //     if (item1['id'] != item2['parentId']) {
-    //       newList.add(item2);
-    //       // break;
-    //     }
-    //   }
-    // }
-    // newList.addAll(filterChildrenList);
-    // newList.forEach((element) {
-    //   element['children'] = [];
-    // });
-    // logger.v(newList);
+    // List中多余的元素
+    var list1 = [];
+    for (var value2 in checkedList) {
+      if (value2['children'] != null && value2['children'].isNotEmpty) {
+        value2['children'] = [];
+        for (var value in checkedList) {
+          // 没有children
+          if (value['children'] == null || value['children'].isEmpty) {
+            if (value2['id'] == value['parentId']) {
+              list1.add(value);
+            }
+          }
+        }
+      }
+    }
+    // 移除List中多余的元素
+    var set = Set.from(checkedList);
+    var set2 = Set.from(list1);
+    var filterList = List.from(set.difference(set2));
+    logger.v(filterList);
+    logger.v(filterList.length);
   }
 
   /// @params

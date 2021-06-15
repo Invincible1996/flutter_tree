@@ -451,26 +451,26 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     loadData();
-    print(list.length);
-    // List中多余的元素
-    var list1 = [];
-    for (var value2 in list) {
-      if (value2['children'] != null && value2['children'].isNotEmpty) {
-        for (var value in list) {
-          // 没有children
-          if (value['children'] == null || value['children'].isEmpty) {
-            if (value2['id'] == value['parentId']) {
-              list1.add(value);
-            }
-          }
-        }
-      }
-    }
-    // 移除List中多余的元素
-    var set = Set.from(list);
-    var set2 = Set.from(list1);
-    var filterList = List.from(set.difference(set2));
-    logger.v(filterList);
+    // print(list.length);
+    // // List中多余的元素
+    // var list1 = [];
+    // for (var value2 in list) {
+    //   if (value2['children'] != null && value2['children'].isNotEmpty) {
+    //     for (var value in list) {
+    //       // 没有children
+    //       if (value['children'] == null || value['children'].isEmpty) {
+    //         if (value2['id'] == value['parentId']) {
+    //           list1.add(value);
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+    // // 移除List中多余的元素
+    // var set = Set.from(list);
+    // var set2 = Set.from(list1);
+    // var filterList = List.from(set.difference(set2));
+    // logger.v(filterList);
   }
 
   loadData() async {
