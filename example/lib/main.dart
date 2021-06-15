@@ -451,6 +451,59 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     loadData();
+
+    var list = [
+      {
+        'id': 1,
+        'parentId': 0,
+        'children': [
+          {
+            'id': 10,
+            'parentId': 1,
+            'children': [],
+          },
+          {
+            'id': 11,
+            'parentId': 1,
+            'children': [
+              {
+                'id': 111,
+                'parentId': 11,
+                'children': [],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        'id': 10,
+        'parentId': 1,
+        'children': [],
+      },
+      {
+        'id': 11,
+        'parentId': 1,
+        'children': [
+          {
+            'id': 111,
+            'parentId': 11,
+            'children': [],
+          },
+        ],
+      },
+      {
+        'id': 111,
+        'parentId': 11,
+        'children': [],
+      },
+    ];
+
+    var set = {1, 23, 4, 5, 6, 7, 8};
+
+    set.add(1);
+    print(set);
+    // logger.v(set);
+
     // print(list.length);
     // // List中多余的元素
     // var list1 = [];
@@ -491,7 +544,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: treeListData.isNotEmpty
           ? FlutterTree(
               listData: treeListData,
-              initialListData: list,
+              initialListData: [],
               config: Config(parentId: 'parentId', dataType: DataType.DataList, label: 'knowledgeName'),
             )
           : CircularProgressIndicator(),
