@@ -40,7 +40,11 @@ class Config {
   });
 }
 
-var logger = Logger();
+var logger = Logger(
+  printer: PrettyPrinter(
+    methodCount: 0,
+  ),
+);
 
 class FlutterTree extends StatefulWidget {
   /// source data type Map
@@ -319,10 +323,10 @@ class _FlutterTreeState extends State<FlutterTree> {
     if (dataModel[widget.config.parentId]! > 0) {
       updateParentNode(dataModel);
     }
-    getCheckedItems();
     setState(() {
       sourceTreeMap = sourceTreeMap;
     });
+    getCheckedItems();
   }
 
   /// @params
@@ -359,7 +363,22 @@ class _FlutterTreeState extends State<FlutterTree> {
     var set = Set.from(checkedList);
     var set2 = Set.from(list1);
     var filterList = List.from(set.difference(set2));
-    logger.v(filterList.length);
+    var submitList = filterList
+        .map(
+          (e) => {
+            "subject": e['subject'],
+            "exams": e['exams'],
+            "parentId": e['parentId'],
+            "knowledgeNo": e['knowledgeNo'],
+            "knowledgeName": e['knowledgeName'],
+            "examPaperData": e['examPaperData'],
+            "id": e['id'],
+            "level": e['level'],
+          },
+        )
+        .toList();
+    logger.v(submitList.length);
+    logger.v(submitList);
   }
 
   /// @params
