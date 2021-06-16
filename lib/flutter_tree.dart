@@ -59,6 +59,8 @@ class FlutterTree extends StatefulWidget {
   ///  initial source data type List
   final List<Map<String, dynamic>> initialListData;
 
+  final Function(List<Map<String, dynamic>>) onChecked;
+
   ///  Config
   final Config config;
 
@@ -69,6 +71,7 @@ class FlutterTree extends StatefulWidget {
     this.config = const Config(),
     this.listData = const <Map<String, dynamic>>[],
     this.initialListData = const <Map<String, dynamic>>[],
+    required this.onChecked,
   }) : super(key: key);
 
   @override
@@ -362,23 +365,24 @@ class _FlutterTreeState extends State<FlutterTree> {
     // 移除List中多余的元素
     var set = Set.from(checkedList);
     var set2 = Set.from(list1);
-    var filterList = List.from(set.difference(set2));
-    var submitList = filterList
-        .map(
-          (e) => {
-            "subject": e['subject'],
-            "exams": e['exams'],
-            "parentId": e['parentId'],
-            "knowledgeNo": e['knowledgeNo'],
-            "knowledgeName": e['knowledgeName'],
-            "examPaperData": e['examPaperData'],
-            "id": e['id'],
-            "level": e['level'],
-          },
-        )
-        .toList();
-    logger.v(submitList.length);
-    logger.v(submitList);
+    List<Map<String, dynamic>> filterList = List.from(set.difference(set2));
+    widget.onChecked(filterList);
+    // var submitList = filterList
+    //     .map(
+    //       (e) => {
+    //         "subject": e['subject'],
+    //         "exams": e['exams'],
+    //         "parentId": e['parentId'],
+    //         "knowledgeNo": e['knowledgeNo'],
+    //         "knowledgeName": e['knowledgeName'],
+    //         "examPaperData": e['examPaperData'],
+    //         "id": e['id'],
+    //         "level": e['level'],
+    //       },
+    //     )
+    //     .toList();
+    // logger.v(submitList.length);
+    // logger.v(submitList);
   }
 
   /// @params

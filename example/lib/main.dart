@@ -451,79 +451,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     loadData();
-
-    var list = [
-      {
-        'id': 1,
-        'parentId': 0,
-        'children': [
-          {
-            'id': 10,
-            'parentId': 1,
-            'children': [],
-          },
-          {
-            'id': 11,
-            'parentId': 1,
-            'children': [
-              {
-                'id': 111,
-                'parentId': 11,
-                'children': [],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        'id': 10,
-        'parentId': 1,
-        'children': [],
-      },
-      {
-        'id': 11,
-        'parentId': 1,
-        'children': [
-          {
-            'id': 111,
-            'parentId': 11,
-            'children': [],
-          },
-        ],
-      },
-      {
-        'id': 111,
-        'parentId': 11,
-        'children': [],
-      },
-    ];
-
-    var set = {1, 23, 4, 5, 6, 7, 8};
-
-    set.add(1);
-    print(set);
-    // logger.v(set);
-
-    // print(list.length);
-    // // List中多余的元素
-    // var list1 = [];
-    // for (var value2 in list) {
-    //   if (value2['children'] != null && value2['children'].isNotEmpty) {
-    //     for (var value in list) {
-    //       // 没有children
-    //       if (value['children'] == null || value['children'].isEmpty) {
-    //         if (value2['id'] == value['parentId']) {
-    //           list1.add(value);
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-    // // 移除List中多余的元素
-    // var set = Set.from(list);
-    // var set2 = Set.from(list1);
-    // var filterList = List.from(set.difference(set2));
-    // logger.v(filterList);
   }
 
   loadData() async {
@@ -546,6 +473,9 @@ class _MyHomePageState extends State<MyHomePage> {
               listData: treeListData,
               initialListData: [],
               config: Config(parentId: 'parentId', dataType: DataType.DataList, label: 'knowledgeName'),
+              onChecked: (List<Map<String, dynamic>> checkedList) {
+                logger.v(checkedList);
+              },
             )
           : CircularProgressIndicator(),
     );
