@@ -1,10 +1,6 @@
-/*
- * @Date: 2021/6/9 18:41
- * @Author: kevin
- * @LastEditors: Big.shot
- * @LastEditTime: 2021-04-09 11:50:09
- * @Description: dart
- */
+/// @create at 2021/7/15 15:01
+/// @create by kevin
+/// @desc stack
 class MStack {
   int top = 0;
   List items = [];

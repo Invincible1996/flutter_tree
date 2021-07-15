@@ -1,10 +1,8 @@
-/*
- * @Date: 2021/6/9 14:11
- * @Author: kevin
- * @LastEditors: Big.shot
- * @LastEditTime: 2021-04-09 11:50:09
- * @Description: dart
- */
+/// @create at 2021/7/15 14:59
+/// @create by kevin
+/// @desc TreeDataModel
+///
+///
 class TreeDataModel {
   int? id;
   int? value;

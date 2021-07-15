@@ -1,10 +1,8 @@
-/*
- * @Date: 2021/6/10 20:15
- * @Author: kevin
- * @Description: dart
- */
-
 import 'package:flutter_tree/flutter_tree.dart';
+
+/// @create at 2021/7/15 15:01
+/// @create by kevin
+/// @desc
 
 class DataUtil {
   /// @params

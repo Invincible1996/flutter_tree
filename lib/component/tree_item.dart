@@ -1,11 +1,8 @@
-/*
- * @Date: 2021/6/9 15:04
- * @Author: kevin
- * @LastEditors: Big.shot
- * @LastEditTime: 2021-04-09 11:50:09
- * @Description: dart
- */
-
+/// @create at 2021/7/15 14:58
+/// @create by kevin
+/// @desc TreeItem
+///
+///
 import 'package:flutter/material.dart';
 import 'package:flutter_tree/model/tree_data_model.dart';
 
