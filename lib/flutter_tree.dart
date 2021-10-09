@@ -12,7 +12,7 @@ enum DataType {
 
 /// @create at 2021/7/15 15:01
 /// @create by kevin
-/// @desc  Config util
+/// @desc  参数类型配置
 class Config {
   ///数据类型
 
