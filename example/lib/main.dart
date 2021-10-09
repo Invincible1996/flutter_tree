@@ -2,8 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_tree/flutter_tree.dart';
-import 'package:logger/logger.dart';
+import 'package:flutter_tree_pro/flutter_tree.dart';
 
 final logger = Logger(
   printer: PrettyPrinter(

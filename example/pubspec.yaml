@@ -29,7 +29,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   logger: ^1.0.0
-  flutter_tree:
+  flutter_tree_pro:
     path: ../
 
 dev_dependencies:

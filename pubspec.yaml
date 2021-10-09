@@ -1,8 +1,7 @@
-name: flutter_tree
-description: A new Flutter package.
-version: 0.0.1
-homepage:
-publish_to: 'none'
+name: flutter_tree_pro
+description: Flutter tree select widget.
+version: 0.0.3
+homepage: https://github.com/Invincible1996/flutter_tree
 
 environment:
   sdk: ">=2.12.0 <3.0.0"

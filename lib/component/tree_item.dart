@@ -4,7 +4,7 @@
 ///
 ///
 import 'package:flutter/material.dart';
-import 'package:flutter_tree/model/tree_data_model.dart';
+import 'package:flutter_tree_pro/model/tree_data_model.dart';
 
 class TreeItem extends StatelessWidget {
   final TreeDataModel item;
