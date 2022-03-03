@@ -1,13 +1,9 @@
 library packages;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_tree_pro/utils/data_util.dart';
-import 'package:flutter_tree_pro/utils/util.dart';
 import 'package:logger/logger.dart';
 
-export 'package:flutter_tree_pro/utils/data_util.dart';
-export 'package:flutter_tree_pro/utils/util.dart';
-export 'package:logger/logger.dart';
+import 'flutter_tree_pro.dart';
 
 enum DataType {
   DataList,
@@ -56,7 +52,7 @@ var logger = Logger(
 /// @create at 2021/7/15 15:01
 /// @create by kevin
 /// @desc components
-class FlutterTree extends StatefulWidget {
+class FlutterTreePro extends StatefulWidget {
   /// source data type Map
   final Map<String, dynamic> treeData;
 
@@ -74,7 +70,7 @@ class FlutterTree extends StatefulWidget {
   ///  Config
   final Config config;
 
-  FlutterTree({
+  FlutterTreePro({
     Key? key,
     this.treeData = const <String, dynamic>{},
     this.initialTreeData = const <String, dynamic>{},
@@ -85,10 +81,10 @@ class FlutterTree extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _FlutterTreeState createState() => _FlutterTreeState();
+  _FlutterTreeProState createState() => _FlutterTreeProState();
 }
 
-class _FlutterTreeState extends State<FlutterTree> {
+class _FlutterTreeProState extends State<FlutterTreePro> {
   ///
   Map<String, dynamic> sourceTreeMap = {};
 
