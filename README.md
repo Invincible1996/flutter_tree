@@ -17,7 +17,7 @@ Use as a widget
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('TestException')),
+      appBar: AppBar(title: Text('Flutter tree pro')),
       body: Container(
         child: FlutterTree(
           listData: treeListData,
