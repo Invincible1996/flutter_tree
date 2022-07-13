@@ -70,6 +70,9 @@ class FlutterTreePro extends StatefulWidget {
   ///  Config
   final Config config;
 
+  /// if expanded items
+  final bool isExpanded;
+
   FlutterTreePro({
     Key? key,
     this.treeData = const <String, dynamic>{},
@@ -78,6 +81,7 @@ class FlutterTreePro extends StatefulWidget {
     this.listData = const <Map<String, dynamic>>[],
     this.initialListData = const <Map<String, dynamic>>[],
     required this.onChecked,
+    this.isExpanded = false,
   }) : super(key: key);
 
   @override
@@ -110,7 +114,8 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     super.initState();
     // set default select
     if (widget.config.dataType == DataType.DataList) {
-      var listToMap = DataUtil.transformListToMap(widget.listData, widget.config);
+      var listToMap =
+          DataUtil.transformListToMap(widget.listData, widget.config);
       sourceTreeMap = listToMap;
       factoryTreeData(sourceTreeMap);
       widget.initialListData.forEach((element) {
@@ -144,7 +149,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   /// @params
   /// @desc expand tree data to map
   factoryTreeData(treeModel) {
-    treeModel['open'] = false;
+    treeModel['open'] = widget.isExpanded;
     treeModel['checked'] = 0;
     treeMap.putIfAbsent(treeModel[widget.config.id], () => treeModel);
     (treeModel[widget.config.children] ?? []).forEach((element) {
@@ -169,7 +174,9 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
                   children: [
                     (sourceTreeMap[widget.config.children] ?? []).isNotEmpty
                         ? Icon(
-                            (sourceTreeMap['open'] ?? false) ? Icons.keyboard_arrow_down_rounded : Icons.keyboard_arrow_right,
+                            (sourceTreeMap['open'] ?? false)
+                                ? Icons.keyboard_arrow_down_rounded
+                                : Icons.keyboard_arrow_right,
                             size: 20,
                           )
                         : SizedBox.shrink(),
@@ -223,7 +230,9 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
                   children: [
                     (e[widget.config.children] ?? []).isNotEmpty
                         ? Icon(
-                            (e['open'] ?? false) ? Icons.keyboard_arrow_down_rounded : Icons.keyboard_arrow_right,
+                            (e['open'] ?? false)
+                                ? Icons.keyboard_arrow_down_rounded
+                                : Icons.keyboard_arrow_right,
                             size: 20,
                           )
                         : SizedBox.shrink(),
@@ -410,14 +419,17 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     // 如果子孩子全都是选择的， 父节点就全选
     if (checkLen == (par[widget.config.children] ?? []).length) {
       par['checked'] = 2;
-    } else if (partChecked || (checkLen < (par[widget.config.children] ?? []).length && checkLen > 0)) {
+    } else if (partChecked ||
+        (checkLen < (par[widget.config.children] ?? []).length &&
+            checkLen > 0)) {
       par['checked'] = 1;
     } else {
       par['checked'] = 0;
     }
 
     // 如果还有父节点 解析往上更新
-    if (treeMap[par[widget.config.parentId]] != null || treeMap[par[widget.config.parentId]] == 0) {
+    if (treeMap[par[widget.config.parentId]] != null ||
+        treeMap[par[widget.config.parentId]] == 0) {
       updateParentNode(par);
     }
   }

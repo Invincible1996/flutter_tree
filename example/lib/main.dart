@@ -73,6 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: treeListData.isNotEmpty
           ? FlutterTreePro(
+              // isExpanded: true,
               listData: treeListData,
               initialListData: initialTreeData,
               config: Config(
