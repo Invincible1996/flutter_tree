@@ -72,20 +72,26 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: treeListData.isNotEmpty
-          ? FlutterTreePro(
-              // isExpanded: true,
-              listData: treeListData,
-              initialListData: initialTreeData,
-              config: Config(
-                parentId: 'parentId',
-                dataType: DataType.DataList,
-                label: 'value',
+          ? Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FlutterTreePro(
+                isRTL: false,
+                isExpanded: false,
+                listData: treeListData,
+                initialListData: initialTreeData,
+                config: Config(
+                  parentId: 'parentId',
+                  dataType: DataType.DataList,
+                  label: 'value',
+                ),
+                onChecked: (List<Map<String, dynamic>> checkedList) {
+                  logger.v(checkedList);
+                },
               ),
-              onChecked: (List<Map<String, dynamic>> checkedList) {
-                logger.v(checkedList);
-              },
             )
-          : Center(child: CircularProgressIndicator()),
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 }

@@ -73,6 +73,9 @@ class FlutterTreePro extends StatefulWidget {
   /// if expanded items
   final bool isExpanded;
 
+  /// is right to left
+  final bool isRTL;
+
   FlutterTreePro({
     Key? key,
     this.treeData = const <String, dynamic>{},
@@ -82,6 +85,7 @@ class FlutterTreePro extends StatefulWidget {
     this.initialListData = const <Map<String, dynamic>>[],
     required this.onChecked,
     this.isExpanded = false,
+    this.isRTL = false,
   }) : super(key: key);
 
   @override
@@ -114,8 +118,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     super.initState();
     // set default select
     if (widget.config.dataType == DataType.DataList) {
-      var listToMap =
-          DataUtil.transformListToMap(widget.listData, widget.config);
+      var listToMap = DataUtil.transformListToMap(widget.listData, widget.config);
       sourceTreeMap = listToMap;
       factoryTreeData(sourceTreeMap);
       widget.initialListData.forEach((element) {
@@ -168,18 +171,20 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.only(left: 20, top: 15),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  textDirection: widget.isRTL ? TextDirection.rtl : TextDirection.ltr,
                   children: [
                     (sourceTreeMap[widget.config.children] ?? []).isNotEmpty
                         ? Icon(
                             (sourceTreeMap['open'] ?? false)
                                 ? Icons.keyboard_arrow_down_rounded
-                                : Icons.keyboard_arrow_right,
+                                : (widget.isRTL ? Icons.keyboard_arrow_left_rounded : Icons.keyboard_arrow_right_rounded),
                             size: 20,
                           )
-                        : SizedBox.shrink(),
+                        : SizedBox(
+                            width: widget.isRTL ? 30 : 0,
+                          ),
                     SizedBox(
                       width: 5,
                     ),
@@ -194,6 +199,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
                     ),
                     Expanded(
                       child: Text(
+                        textAlign: widget.isRTL ? TextAlign.end : TextAlign.start,
                         '${sourceTreeMap[widget.config.label]}',
                         style: TextStyle(fontSize: 16),
                       ),
@@ -202,6 +208,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
                 ),
                 (sourceTreeMap['open'] ?? false)
                     ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: buildTreeNode(sourceTreeMap),
                       )
                     : SizedBox.shrink(),
@@ -221,21 +228,29 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
         return GestureDetector(
           onTap: () => onOpenNode(e),
           child: Container(
-            width: MediaQuery.of(context).size.width,
+            color: Colors.white,
+            // width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.only(left: 20, top: 15),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              textDirection: TextDirection.rtl,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Row(
+                  textDirection: widget.isRTL ? TextDirection.rtl : TextDirection.ltr,
                   children: [
+                    SizedBox(
+                      width: widget.isRTL ? 20 : 20,
+                    ),
                     (e[widget.config.children] ?? []).isNotEmpty
                         ? Icon(
                             (e['open'] ?? false)
                                 ? Icons.keyboard_arrow_down_rounded
-                                : Icons.keyboard_arrow_right,
+                                : (widget.isRTL ? Icons.keyboard_arrow_left_rounded : Icons.keyboard_arrow_right_rounded),
                             size: 20,
                           )
-                        : SizedBox.shrink(),
+                        : SizedBox(
+                            width: widget.isRTL ? 30 : 20,
+                          ),
                     SizedBox(
                       width: 5,
                     ),
@@ -251,6 +266,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
                     Expanded(
                       child: Text(
                         '${e[widget.config.label]}',
+                        textAlign: widget.isRTL ? TextAlign.end : TextAlign.start,
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
@@ -258,6 +274,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
                 ),
                 (e['open'] ?? false)
                     ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: buildTreeNode(e),
                       )
                     : SizedBox.shrink(),
@@ -382,22 +399,6 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     var set2 = Set.from(list1);
     List<Map<String, dynamic>> filterList = List.from(set.difference(set2));
     widget.onChecked(filterList);
-    // var submitList = filterList
-    //     .map(
-    //       (e) => {
-    //         "subject": e['subject'],
-    //         "exams": e['exams'],
-    //         "parentId": e['parentId'],
-    //         "knowledgeNo": e['knowledgeNo'],
-    //         "knowledgeName": e['knowledgeName'],
-    //         "examPaperData": e['examPaperData'],
-    //         "id": e['id'],
-    //         "level": e['level'],
-    //       },
-    //     )
-    //     .toList();
-    // logger.v(submitList.length);
-    // logger.v(submitList);
   }
 
   /// @params
@@ -419,17 +420,14 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     // 如果子孩子全都是选择的， 父节点就全选
     if (checkLen == (par[widget.config.children] ?? []).length) {
       par['checked'] = 2;
-    } else if (partChecked ||
-        (checkLen < (par[widget.config.children] ?? []).length &&
-            checkLen > 0)) {
+    } else if (partChecked || (checkLen < (par[widget.config.children] ?? []).length && checkLen > 0)) {
       par['checked'] = 1;
     } else {
       par['checked'] = 0;
     }
 
     // 如果还有父节点 解析往上更新
-    if (treeMap[par[widget.config.parentId]] != null ||
-        treeMap[par[widget.config.parentId]] == 0) {
+    if (treeMap[par[widget.config.parentId]] != null || treeMap[par[widget.config.parentId]] == 0) {
       updateParentNode(par);
     }
   }
