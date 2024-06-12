@@ -118,7 +118,8 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     super.initState();
     // set default select
     if (widget.config.dataType == DataType.DataList) {
-      var listToMap = DataUtil.transformListToMap(widget.listData, widget.config);
+      var listToMap =
+          DataUtil.transformListToMap(widget.listData, widget.config);
       sourceTreeMap = listToMap;
       factoryTreeData(sourceTreeMap);
       widget.initialListData.forEach((element) {
@@ -173,13 +174,16 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
             child: Column(
               children: [
                 Row(
-                  textDirection: widget.isRTL ? TextDirection.rtl : TextDirection.ltr,
+                  textDirection:
+                      widget.isRTL ? TextDirection.rtl : TextDirection.ltr,
                   children: [
                     (sourceTreeMap[widget.config.children] ?? []).isNotEmpty
                         ? Icon(
                             (sourceTreeMap['open'] ?? false)
                                 ? Icons.keyboard_arrow_down_rounded
-                                : (widget.isRTL ? Icons.keyboard_arrow_left_rounded : Icons.keyboard_arrow_right_rounded),
+                                : (widget.isRTL
+                                    ? Icons.keyboard_arrow_left_rounded
+                                    : Icons.keyboard_arrow_right_rounded),
                             size: 20,
                           )
                         : SizedBox(
@@ -199,7 +203,8 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
                     ),
                     Expanded(
                       child: Text(
-                        textAlign: widget.isRTL ? TextAlign.end : TextAlign.start,
+                        textAlign:
+                            widget.isRTL ? TextAlign.end : TextAlign.start,
                         '${sourceTreeMap[widget.config.label]}',
                         style: TextStyle(fontSize: 16),
                       ),
@@ -236,7 +241,8 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Row(
-                  textDirection: widget.isRTL ? TextDirection.rtl : TextDirection.ltr,
+                  textDirection:
+                      widget.isRTL ? TextDirection.rtl : TextDirection.ltr,
                   children: [
                     SizedBox(
                       width: widget.isRTL ? 20 : 20,
@@ -245,7 +251,9 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
                         ? Icon(
                             (e['open'] ?? false)
                                 ? Icons.keyboard_arrow_down_rounded
-                                : (widget.isRTL ? Icons.keyboard_arrow_left_rounded : Icons.keyboard_arrow_right_rounded),
+                                : (widget.isRTL
+                                    ? Icons.keyboard_arrow_left_rounded
+                                    : Icons.keyboard_arrow_right_rounded),
                             size: 20,
                           )
                         : SizedBox(
@@ -266,7 +274,8 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
                     Expanded(
                       child: Text(
                         '${e[widget.config.label]}',
-                        textAlign: widget.isRTL ? TextAlign.end : TextAlign.start,
+                        textAlign:
+                            widget.isRTL ? TextAlign.end : TextAlign.start,
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
@@ -420,14 +429,17 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     // 如果子孩子全都是选择的， 父节点就全选
     if (checkLen == (par[widget.config.children] ?? []).length) {
       par['checked'] = 2;
-    } else if (partChecked || (checkLen < (par[widget.config.children] ?? []).length && checkLen > 0)) {
+    } else if (partChecked ||
+        (checkLen < (par[widget.config.children] ?? []).length &&
+            checkLen > 0)) {
       par['checked'] = 1;
     } else {
       par['checked'] = 0;
     }
 
     // 如果还有父节点 解析往上更新
-    if (treeMap[par[widget.config.parentId]] != null || treeMap[par[widget.config.parentId]] == 0) {
+    if (treeMap[par[widget.config.parentId]] != null ||
+        treeMap[par[widget.config.parentId]] == 0) {
       updateParentNode(par);
     }
   }
