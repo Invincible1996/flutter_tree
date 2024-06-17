@@ -14,3 +14,5 @@
 - add isExpanded property
 ## 0.0.8
 - add isRTL property
+## 0.0.9
+- change data list type

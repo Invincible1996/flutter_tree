@@ -4,7 +4,7 @@ Flutter tree select widget.
 
 # Screenshot
 
-![flutter_tree](https://user-images.githubusercontent.com/22675676/136653434-133b7e4a-fa57-463c-a11a-64a8711c9de9.gif)
+![flutter_tree](https://github.com/Invincible1996/flutter_tree/assets/22675676/4e86a835-abf2-4846-a94d-c1597f2076ad)
 
 ## Usage
 
