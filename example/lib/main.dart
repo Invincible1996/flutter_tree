@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tree_pro/flutter_tree_pro.dart';
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.indigo,
+        primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Flutter Tree Demo'),
     );
@@ -36,18 +37,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //默认数据
   List<Map<String, dynamic>> initialTreeData = [
-    {"parentId": 1063, "value": "牡丹江市", "id": 1314},
-    {"parentId": 1063, "value": "齐齐哈尔市", "id": 1318},
-    {"parentId": 1063, "value": "佳木斯市", "id": 1320},
-    {"parentId": 1066, "value": "长春市", "id": 1323},
-    {"parentId": 1066, "value": "通化市", "id": 1325},
-    {"parentId": 1066, "value": "白山市", "id": 1328},
-    {"parentId": 1066, "value": "辽源市", "id": 1330},
-    {"parentId": 1066, "value": "松原市", "id": 1332},
-    {"parentId": 1009, "value": "南京市", "id": 1130},
-    {"parentId": 1009, "value": "无锡市", "id": 1132},
-    {"parentId": 1009, "value": "常州市", "id": 1133},
-    {"parentId": 1009, "value": "镇江市", "id": 1134},
+    {"parentId": 1009, "value": "Suzhou", "id": 1011},
+    {"parentId": 1009, "value": "Wuxi", "id": 1012},
+    {"parentId": 1001, "value": "Brooklyn", "id": 10005},
   ];
 
   @override
@@ -65,29 +57,69 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  bool isRTL = false;
+  bool isExpanded = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue,
         title: Text(widget.title),
       ),
       body: treeListData.isNotEmpty
-          ? Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FlutterTreePro(
-                isRTL: false,
-                isExpanded: false,
-                listData: treeListData,
-                initialListData: initialTreeData,
-                config: Config(
-                  parentId: 'parentId',
-                  dataType: DataType.DataList,
-                  label: 'value',
+          ? Column(
+              children: [
+                // switch RTL
+                Container(
+                  padding: EdgeInsets.all(10),
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'RTL',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      CupertinoSwitch(
+                        value: isRTL,
+                        onChanged: (value) {
+                          setState(() {
+                            // RTL
+                            isRTL = value;
+                          });
+                        },
+                        activeColor: Colors.indigo,
+                      ),
+                    ],
+                  ),
                 ),
-                onChecked: (List<Map<String, dynamic>> checkedList) {
-                  logger.v(checkedList);
-                },
-              ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FlutterTreePro(
+                      isRTL: isRTL,
+                      isExpanded: isExpanded,
+                      listData: treeListData,
+                      initialListData: initialTreeData,
+                      config: Config(
+                        parentId: 'parentId',
+                        dataType: DataType.DataList,
+                        label: 'value',
+                      ),
+                      onChecked: (List<Map<String, dynamic>> checkedList) {
+                        logger.t(checkedList);
+                      },
+                    ),
+                  ),
+                ),
+              ],
             )
           : Center(
               child: CircularProgressIndicator(),

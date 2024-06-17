@@ -54,7 +54,7 @@ var logger = Logger(
 /// @desc components
 class FlutterTreePro extends StatefulWidget {
   /// source data type Map
-  final Map<String, dynamic> treeData;
+  final List<Map<String, dynamic>> treeData;
 
   ///  source data type List
   final List<Map<String, dynamic>> listData;
@@ -78,7 +78,7 @@ class FlutterTreePro extends StatefulWidget {
 
   FlutterTreePro({
     Key? key,
-    this.treeData = const <String, dynamic>{},
+    this.treeData = const <Map<String, dynamic>>[],
     this.initialTreeData = const <String, dynamic>{},
     this.config = const Config(),
     this.listData = const <Map<String, dynamic>>[],
@@ -94,7 +94,7 @@ class FlutterTreePro extends StatefulWidget {
 
 class _FlutterTreeProState extends State<FlutterTreePro> {
   ///
-  Map<String, dynamic> sourceTreeMap = {};
+  List<Map<String, dynamic>> sourceTreeMapList = [];
 
   ///
   bool checkedBox = false;
@@ -118,10 +118,14 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     super.initState();
     // set default select
     if (widget.config.dataType == DataType.DataList) {
-      var listToMap =
-          DataUtil.transformListToMap(widget.listData, widget.config);
-      sourceTreeMap = listToMap;
-      factoryTreeData(sourceTreeMap);
+      final list = DataUtil.convertData(widget.listData);
+      sourceTreeMapList
+        ..clear()
+        ..addAll(list);
+
+      sourceTreeMapList.forEach((element) {
+        factoryTreeData(element);
+      });
       widget.initialListData.forEach((element) {
         element['checked'] = 0;
       });
@@ -135,7 +139,10 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
         selectCheckedBox(item);
       }
     } else {
-      sourceTreeMap = widget.treeData;
+      sourceTreeMapList = widget.treeData;
+      sourceTreeMapList.forEach((element) {
+        factoryTreeData(element);
+      });
     }
   }
 
@@ -163,14 +170,17 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
 
   /// @params
   /// @desc render parent
-  buildTreeParent() {
+  buildTreeParent(sourceTreeMap) {
     return Column(
       children: [
         GestureDetector(
           onTap: () => onOpenNode(sourceTreeMap),
           child: Container(
             width: MediaQuery.of(context).size.width,
-            padding: EdgeInsets.only(left: 20, top: 15),
+            padding: EdgeInsets.only(
+              left: 20,
+              top: 15,
+            ),
             child: Column(
               children: [
                 Row(
@@ -245,7 +255,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
                       widget.isRTL ? TextDirection.rtl : TextDirection.ltr,
                   children: [
                     SizedBox(
-                      width: widget.isRTL ? 20 : 20,
+                      width: widget.isRTL ? 20 : 0,
                     ),
                     (e[widget.config.children] ?? []).isNotEmpty
                         ? Icon(
@@ -257,7 +267,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
                             size: 20,
                           )
                         : SizedBox(
-                            width: widget.isRTL ? 30 : 20,
+                            width: widget.isRTL ? 30 : 10,
                           ),
                     SizedBox(
                       width: 5,
@@ -325,7 +335,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     if ((model[widget.config.children] ?? []).isEmpty) return;
     model['open'] = !model['open'];
     setState(() {
-      sourceTreeMap = sourceTreeMap;
+      sourceTreeMapList = sourceTreeMapList;
     });
   }
 
@@ -368,14 +378,16 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
       updateParentNode(dataModel);
     }
     setState(() {
-      sourceTreeMap = sourceTreeMap;
+      sourceTreeMapList = sourceTreeMapList;
     });
-    getCheckedItems();
+    sourceTreeMapList.forEach((element) {
+      getCheckedItems(element);
+    });
   }
 
   /// @params
   /// @desc 获取选中的条目
-  getCheckedItems() {
+  getCheckedItems(sourceTreeMap) {
     var stack = MStack();
     var checkedList = [];
     stack.push(sourceTreeMap);
@@ -388,8 +400,6 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
         checkedList.add(node);
       }
     }
-
-    // logger.v(checkedList.length);
 
     // List中多余的元素
     var list1 = [];
@@ -449,7 +459,11 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     return Container(
       color: Colors.white,
       child: SingleChildScrollView(
-        child: buildTreeParent(),
+        child: Column(
+          children: sourceTreeMapList.map<Widget>((e) {
+            return buildTreeParent(e);
+          }).toList(),
+        ),
       ),
     );
   }

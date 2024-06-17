@@ -35,6 +35,37 @@ class DataUtil {
     return obj[rootId] ?? {};
   }
 
+  static List<Map<String, dynamic>> convertData(
+      List<Map<String, dynamic>> data) {
+    Map<int, Map<String, dynamic>> idMap = {};
+
+    // 首先将数据映射到一个 Map 中，键为 id，值为对应的数据项
+    for (Map<String, dynamic> item in data) {
+      idMap[item['id']] = item;
+    }
+
+    List<Map<String, dynamic>> result = [];
+
+    // 遍历每个数据项
+    for (Map<String, dynamic> item in data) {
+      int parentId = item['parentId'];
+
+      // 如果当前项的父级 ID 不存在于数据中，则它是根节点
+      if (!idMap.containsKey(parentId)) {
+        result.add(item);
+      } else {
+        // 否则，将它添加到父级的 children 列表中
+        Map<String, dynamic>? parent = idMap[parentId];
+        if (parent != null) {
+          parent.putIfAbsent('children', () => []);
+          parent['children'].add(item);
+        }
+      }
+    }
+
+    return result;
+  }
+
   /// @params
   /// @desc expand tree map
   Map<String, dynamic> expandMap(Map<String, dynamic> dataMap, Config config) {

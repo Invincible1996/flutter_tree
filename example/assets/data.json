@@ -2,499 +2,103 @@
   "country": [
     {
       "parentId": 0,
-      "value": "中华人民共和国",
+      "value": "China",
       "id": 6
     },
     {
       "parentId": 6,
-      "value": "上海市",
+      "value": "Shanghai",
       "id": 1007
     },
     {
       "parentId": 1007,
-      "value": "嘉定区",
+      "value": "Jiading District",
       "id": 1008
     },
     {
-      "parentId": 6,
-      "value": "江苏省",
-      "id": 1009
-    },
-    {
-      "parentId": 6,
-      "value": "浙江省",
-      "id": 1010
-    },
-    {
-      "parentId": 6,
-      "value": "湖北省",
-      "id": 1011
-    },
-    {
-      "parentId": 6,
-      "value": "广东省",
-      "id": 1012
-    },
-    {
-      "parentId": 6,
-      "value": "北京市",
-      "id": 1013
-    },
-    {
-      "parentId": 6,
-      "value": "安徽省",
-      "id": 1014
-    },
-    {
-      "parentId": 6,
-      "value": "河南省",
-      "id": 1015
-    },
-    {
-      "parentId": 6,
-      "value": "湖南省",
-      "id": 1016
-    },
-    {
-      "parentId": 6,
-      "value": "陕西省",
-      "id": 1021
-    },
-    {
-      "parentId": 6,
-      "value": "山西省",
-      "id": 1024
-    },
-    {
-      "parentId": 6,
-      "value": "山东省",
-      "id": 1025
-    },
-    {
-      "parentId": 6,
-      "value": "广西壮族自治区",
-      "id": 1026
-    },
-    {
-      "parentId": 6,
-      "value": "贵州省",
-      "id": 1027
-    },
-    {
-      "parentId": 6,
-      "value": "新疆维吾尔自治区",
-      "id": 1028
-    },
-    {
-      "parentId": 6,
-      "value": "西藏自治区",
-      "id": 1029
-    },
-    {
-      "parentId": 6,
-      "value": "江西省",
-      "id": 1030
-    },
-    {
-      "parentId": 6,
-      "value": "福建省",
-      "id": 1033
-    },
-    {
-      "parentId": 6,
-      "value": "四川省",
-      "id": 1035
-    },
-    {
-      "parentId": 6,
-      "value": "云南省",
-      "id": 1038
-    },
-    {
-      "parentId": 6,
-      "value": "辽宁省",
-      "id": 1042
-    },
-    {
-      "parentId": 6,
-      "value": "黑龙江省",
-      "id": 1063
-    },
-    {
-      "parentId": 6,
-      "value": "吉林省",
-      "id": 1066
-    },
-    {
       "parentId": 1007,
-      "value": "长宁区",
+      "value": "Changning District",
       "id": 1118
     },
     {
       "parentId": 1007,
-      "value": "浦东新区",
+      "value": "Pudong New Area",
       "id": 1121
     },
     {
-      "parentId": 1009,
-      "value": "苏州市",
-      "id": 1125
+      "parentId": 6,
+      "value": "Jiangsu Province",
+      "id": 1009
     },
     {
       "parentId": 1009,
-      "value": "南京市",
-      "id": 1130
+      "value": "Nanjing",
+      "id": 1010
     },
     {
       "parentId": 1009,
-      "value": "无锡市",
-      "id": 1132
+      "value": "Suzhou",
+      "id": 1011
     },
     {
       "parentId": 1009,
-      "value": "常州市",
-      "id": 1133
+      "value": "Wuxi",
+      "id": 1012
     },
     {
-      "parentId": 1009,
-      "value": "镇江市",
-      "id": 1134
-    },
-    {
-      "parentId": 1010,
-      "value": "杭州市",
-      "id": 1138
-    },
-    {
-      "parentId": 1010,
-      "value": "宁波市",
-      "id": 1140
-    },
-    {
-      "parentId": 1010,
-      "value": "温州市",
-      "id": 1142
-    },
-    {
-      "parentId": 1010,
-      "value": "衢州市",
-      "id": 1145
-    },
-    {
-      "parentId": 1011,
-      "value": "武汉市",
-      "id": 1154
-    },
-    {
-      "parentId": 1012,
-      "value": "深圳市",
-      "id": 1156
-    },
-    {
-      "parentId": 1012,
-      "value": "湛江市",
-      "id": 1159
+      "parentId": 6,
+      "value": "Beijing",
+      "id": 1013
     },
     {
       "parentId": 1013,
-      "value": "朝阳区",
+      "value": "Chaoyang District",
       "id": 1162
     },
     {
       "parentId": 1013,
-      "value": "东城区",
+      "value": "Dongcheng District",
       "id": 1165
     },
     {
-      "parentId": 1014,
-      "value": "合肥市",
-      "id": 1166
+      "parentId": 1,
+      "value": "United States",
+      "id": 101
     },
     {
-      "parentId": 1014,
-      "value": "六安市",
-      "id": 1169
+      "parentId": 101,
+      "value": "New York",
+      "id": 1001
     },
     {
-      "parentId": 1014,
-      "value": "芜湖市",
-      "id": 1171
+      "parentId": 1001,
+      "value": "Manhattan",
+      "id": 10003
     },
     {
-      "parentId": 1015,
-      "value": "郑州市",
-      "id": 1172
+      "parentId": 1001,
+      "value": "Queens",
+      "id": 10004
     },
     {
-      "parentId": 1015,
-      "value": "开封市",
-      "id": 1173
+      "parentId": 1001,
+      "value": "Brooklyn",
+      "id": 10005
     },
     {
-      "parentId": 1016,
-      "value": "长沙市",
-      "id": 1174
+      "parentId": 101,
+      "value": "California",
+      "id": 1002
     },
     {
-      "parentId": 1016,
-      "value": "株洲市",
-      "id": 1175
+      "parentId": 1002,
+      "value": "Los Angeles",
+      "id": 10006
     },
     {
-      "parentId": 1016,
-      "value": "常德市",
-      "id": 1176
-    },
-    {
-      "parentId": 1021,
-      "value": "西安市",
-      "id": 1177
-    },
-    {
-      "parentId": 1021,
-      "value": "咸阳市",
-      "id": 1178
-    },
-    {
-      "parentId": 1021,
-      "value": "渭南市",
-      "id": 1179
-    },
-    {
-      "parentId": 1021,
-      "value": "商洛市",
-      "id": 1180
-    },
-    {
-      "parentId": 1021,
-      "value": "延安市",
-      "id": 1182
-    },
-    {
-      "parentId": 1021,
-      "value": "汉中市",
-      "id": 1184
-    },
-    {
-      "parentId": 1021,
-      "value": "宝鸡市",
-      "id": 1186
-    },
-    {
-      "parentId": 1024,
-      "value": "太原市",
-      "id": 1187
-    },
-    {
-      "parentId": 1024,
-      "value": "大同市",
-      "id": 1188
-    },
-    {
-      "parentId": 1025,
-      "value": "济南市",
-      "id": 1189
-    },
-    {
-      "parentId": 1025,
-      "value": "青岛市",
-      "id": 1190
-    },
-    {
-      "parentId": 1025,
-      "value": "枣庄市",
-      "id": 1191
-    },
-    {
-      "parentId": 1025,
-      "value": "威海市",
-      "id": 1192
-    },
-    {
-      "parentId": 1025,
-      "value": "烟台市",
-      "id": 1193
-    },
-    {
-      "parentId": 1026,
-      "value": "南宁市",
-      "id": 1223
-    },
-    {
-      "parentId": 1026,
-      "value": "北海市",
-      "id": 1226
-    },
-    {
-      "parentId": 1026,
-      "value": "桂林市",
-      "id": 1229
-    },
-    {
-      "parentId": 1027,
-      "value": "贵阳市",
-      "id": 1233
-    },
-    {
-      "parentId": 1028,
-      "value": "乌鲁木齐市",
-      "id": 1236
-    },
-    {
-      "parentId": 1028,
-      "value": "克拉玛依市",
-      "id": 1239
-    },
-    {
-      "parentId": 1028,
-      "value": "吐鲁番市",
-      "id": 1240
-    },
-    {
-      "parentId": 1028,
-      "value": "哈密市",
-      "id": 1242
-    },
-    {
-      "parentId": 1029,
-      "value": "拉萨市",
-      "id": 1243
-    },
-    {
-      "parentId": 1029,
-      "value": "那曲市",
-      "id": 1244
-    },
-    {
-      "parentId": 1029,
-      "value": "日喀则市",
-      "id": 1246
-    },
-    {
-      "parentId": 1030,
-      "value": "赣州市",
-      "id": 1249
-    },
-    {
-      "parentId": 1030,
-      "value": "九江市",
-      "id": 1250
-    },
-    {
-      "parentId": 1030,
-      "value": "南昌市",
-      "id": 1251
-    },
-    {
-      "parentId": 1033,
-      "value": "福州市",
-      "id": 1253
-    },
-    {
-      "parentId": 1033,
-      "value": "南平市",
-      "id": 1256
-    },
-    {
-      "parentId": 1033,
-      "value": "厦门市",
-      "id": 1260
-    },
-    {
-      "parentId": 1035,
-      "value": "成都市",
-      "id": 1266
-    },
-    {
-      "parentId": 1035,
-      "value": "达州市",
-      "id": 1268
-    },
-    {
-      "parentId": 1038,
-      "value": "玉溪市",
-      "id": 1274
-    },
-    {
-      "parentId": 1042,
-      "value": "沈阳市",
-      "id": 1279
-    },
-    {
-      "parentId": 1042,
-      "value": "锦州市",
-      "id": 1282
-    },
-    {
-      "parentId": 1042,
-      "value": "铁岭市",
-      "id": 1284
-    },
-    {
-      "parentId": 1042,
-      "value": "大连市",
-      "id": 1287
-    },
-    {
-      "parentId": 1042,
-      "value": "营口市",
-      "id": 1291
-    },
-    {
-      "parentId": 1042,
-      "value": "丹东市",
-      "id": 1295
-    },
-    {
-      "parentId": 1063,
-      "value": "哈尔滨市",
-      "id": 1308
-    },
-    {
-      "parentId": 1063,
-      "value": "大庆市",
-      "id": 1311
-    },
-    {
-      "parentId": 1063,
-      "value": "牡丹江市",
-      "id": 1314
-    },
-    {
-      "parentId": 1063,
-      "value": "齐齐哈尔市",
-      "id": 1318
-    },
-    {
-      "parentId": 1063,
-      "value": "佳木斯市",
-      "id": 1320
-    },
-    {
-      "parentId": 1066,
-      "value": "长春市",
-      "id": 1323
-    },
-    {
-      "parentId": 1066,
-      "value": "通化市",
-      "id": 1325
-    },
-    {
-      "parentId": 1066,
-      "value": "白山市",
-      "id": 1328
-    },
-    {
-      "parentId": 1066,
-      "value": "辽源市",
-      "id": 1330
-    },
-    {
-      "parentId": 1066,
-      "value": "松原市",
-      "id": 1332
+      "parentId": 1002,
+      "value": "San Francisco",
+      "id": 10007
     }
   ]
 }
-
