@@ -12,7 +12,7 @@ To use this plugin, add flutter_tree_pro as a dependency in your pubspec.yaml fi
 
 ```
 dependencies:
-  flutter_tree_pro: ^0.0.3
+  flutter_tree_pro: ^0.0.9
 ```
 
 Use as a widget
