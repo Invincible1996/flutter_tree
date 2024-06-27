@@ -42,6 +42,8 @@ class _MyHomePageState extends State<MyHomePage> {
     {"parentId": 1001, "value": "Brooklyn", "id": 10005},
   ];
 
+  List<Map<String, dynamic>> _checkedList = [];
+
   @override
   void initState() {
     super.initState();
@@ -115,8 +117,28 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       onChecked: (List<Map<String, dynamic>> checkedList) {
                         logger.t(checkedList);
+                        setState(() {
+                          _checkedList = checkedList;
+                        });
                       },
                     ),
+                  ),
+                ),
+                //_checkedList count
+                Container(
+                  padding: EdgeInsets.all(10),
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Checked Count: ${_checkedList.length}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

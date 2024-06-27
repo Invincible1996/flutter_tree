@@ -1,5 +1,7 @@
 library packages;
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -122,7 +124,8 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
       sourceTreeMapList
         ..clear()
         ..addAll(list);
-
+      log(sourceTreeMapList.toString());
+      logger.t(sourceTreeMapList);
       sourceTreeMapList.forEach((element) {
         factoryTreeData(element);
       });
@@ -136,7 +139,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
             break;
           }
         }
-        selectCheckedBox(item);
+        selectCheckedBox(item, initial: true);
       }
     } else {
       sourceTreeMapList = widget.treeData;
@@ -349,7 +352,9 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
 
   /// @params
   /// @desc 选中帅选框
-  selectCheckedBox(Map<String, dynamic> dataModel) {
+  /// @params
+  /// @desc 选中帅选框
+  selectCheckedBox(Map<String, dynamic> dataModel, {bool initial = false}) {
     int checked = dataModel['checked']!;
     if ((dataModel[widget.config.children] ?? []).isNotEmpty) {
       var stack = MStack();
@@ -380,14 +385,27 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     setState(() {
       sourceTreeMapList = sourceTreeMapList;
     });
+
+    // 获取选中的最小条目
+    List<Map<String, dynamic>> checkedItems = [];
     sourceTreeMapList.forEach((element) {
-      getCheckedItems(element);
+      checkedItems.addAll(getCheckedItems(element, initial: initial));
     });
+
+    // 调用 onChecked 回调函数
+    if (!initial) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onChecked(checkedItems);
+      });
+    }
   }
 
   /// @params
   /// @desc 获取选中的条目
-  getCheckedItems(sourceTreeMap) {
+  /// @params
+  /// @desc 获取选中的条目
+  List<Map<String, dynamic>> getCheckedItems(sourceTreeMap,
+      {bool initial = false}) {
     var stack = MStack();
     var checkedList = [];
     stack.push(sourceTreeMap);
@@ -396,7 +414,8 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
       for (var item in (node[widget.config.children] ?? [])) {
         stack.push(item);
       }
-      if (node['checked'] == 2) {
+      if (node['checked'] == 2 &&
+          (node[widget.config.children] ?? []).isEmpty) {
         checkedList.add(node);
       }
     }
@@ -417,7 +436,14 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     var set = Set.from(checkedList);
     var set2 = Set.from(list1);
     List<Map<String, dynamic>> filterList = List.from(set.difference(set2));
-    widget.onChecked(filterList);
+
+    if (!initial) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onChecked(filterList);
+      });
+    }
+
+    return filterList;
   }
 
   /// @params
