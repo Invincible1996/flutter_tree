@@ -38,3 +38,6 @@
 
 - fix initial data error
 - add isSingle check property
+
+## 0.0.11
+- add initial selected value

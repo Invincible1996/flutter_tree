@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   bool isRTL = false;
-  bool isExpanded = false;
+  bool isExpanded = true;
   bool isSingleSelect = true;
 
   @override
@@ -107,6 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: FlutterTreePro(
+                      initialSelectValue: 1012,
                       isSingleSelect: true,
                       isRTL: isRTL,
                       isExpanded: isExpanded,

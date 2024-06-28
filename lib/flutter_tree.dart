@@ -81,6 +81,9 @@ class FlutterTreePro extends StatefulWidget {
   /// is single select
   final bool isSingleSelect;
 
+  /// initial select value
+  final int initialSelectValue;
+
   FlutterTreePro({
     Key? key,
     this.treeData = const <Map<String, dynamic>>[],
@@ -92,6 +95,7 @@ class FlutterTreePro extends StatefulWidget {
     this.isExpanded = false,
     this.isRTL = false,
     this.isSingleSelect = false,
+    this.initialSelectValue = 0,
   }) : super(key: key);
 
   @override
@@ -125,6 +129,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   @override
   initState() {
     super.initState();
+    currentSelectId = widget.initialSelectValue;
     // set default select
     if (widget.config.dataType == DataType.DataList) {
       final list = DataUtil.convertData(widget.listData);
@@ -139,14 +144,23 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
       widget.initialListData.forEach((element) {
         element['checked'] = 0;
       });
-      for (var item in widget.initialListData) {
-        for (var element in treeMap.values.toList()) {
-          if (item['id'] == element['id']) {
-            setCheckStatus(element);
+      if (widget.isSingleSelect) {
+        for (var item in treeMap.values.toList()) {
+          if (item['id'] == widget.initialSelectValue) {
+            setCheckStatus(item);
             break;
           }
         }
-        selectCheckedBox(item, initial: true);
+      } else {
+        for (var item in widget.initialListData) {
+          for (var element in treeMap.values.toList()) {
+            if (item['id'] == element['id']) {
+              setCheckStatus(element);
+              break;
+            }
+          }
+          selectCheckedBox(item, initial: true);
+        }
       }
     } else {
       sourceTreeMapList = widget.treeData;
