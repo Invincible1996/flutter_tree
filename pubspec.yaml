@@ -1,10 +1,10 @@
 name: flutter_tree_pro
 description: Flutter tree select widget.You can use it to select tree nodes.This is also support RTL.
-version: 0.0.9
+version: 0.0.10
 homepage: https://github.com/Invincible1996/flutter_tree
 
 environment:
-  sdk: '>=3.4.3 <4.0.0'
+  sdk: ">=3.4.3 <4.0.0"
 
 dependencies:
   flutter:

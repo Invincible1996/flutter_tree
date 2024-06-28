@@ -78,6 +78,9 @@ class FlutterTreePro extends StatefulWidget {
   /// is right to left
   final bool isRTL;
 
+  /// is single select
+  final bool isSingleSelect;
+
   FlutterTreePro({
     Key? key,
     this.treeData = const <Map<String, dynamic>>[],
@@ -88,6 +91,7 @@ class FlutterTreePro extends StatefulWidget {
     required this.onChecked,
     this.isExpanded = false,
     this.isRTL = false,
+    this.isSingleSelect = false,
   }) : super(key: key);
 
   @override
@@ -114,6 +118,9 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   /// @params
   /// @desc expand map tree to map
   Map treeMap = {};
+
+  // 单选功能 当前选中的ID
+  int currentSelectId = 0;
 
   @override
   initState() {
@@ -311,6 +318,31 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   /// @params
   /// @desc render icon by checked type
   Icon buildCheckBoxIcon(Map<String, dynamic> e) {
+    if (widget.isSingleSelect) {
+      return _buildSingleSelectIcon(e);
+    } else {
+      return _buildMultiSelectIcon(e);
+    }
+  }
+
+  Icon _buildSingleSelectIcon(Map<String, dynamic> e) {
+    if (e['children'] == null || e['children'].isEmpty) {
+      return Icon(
+        currentSelectId == e['id']
+            ? Icons.check_box
+            : Icons.check_box_outline_blank,
+        color:
+            currentSelectId == e['id'] ? Color(0X990000FF) : Color(0XFFCCCCCC),
+      );
+    } else {
+      return Icon(
+        Icons.check_box_outline_blank,
+        color: Color(0XFFCCCCCC),
+      );
+    }
+  }
+
+  Icon _buildMultiSelectIcon(Map<String, dynamic> e) {
     switch (e['checked'] ?? 0) {
       case 0:
         return Icon(
@@ -354,31 +386,31 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   /// @desc 选中帅选框
   /// @params
   /// @desc 选中帅选框
-  selectCheckedBox(Map<String, dynamic> dataModel, {bool initial = false}) {
-    int checked = dataModel['checked']!;
-    if ((dataModel[widget.config.children] ?? []).isNotEmpty) {
-      var stack = MStack();
-      stack.push(dataModel);
-      while (stack.top > 0) {
-        Map<String, dynamic> node = stack.pop();
-        for (var item in node[widget.config.children] ?? []) {
-          stack.push(item);
-        }
-        if (checked == 2) {
-          node['checked'] = 0;
-        } else {
-          node['checked'] = 2;
-        }
-      }
+  void selectCheckedBox(Map<String, dynamic> dataModel,
+      {bool initial = false}) {
+    if (widget.isSingleSelect) {
+      _handleSingleSelect(dataModel, initial);
     } else {
-      if (checked == 2) {
-        dataModel['checked'] = 0;
-      } else {
-        dataModel['checked'] = 2;
-      }
+      _handleMultiSelect(dataModel, initial);
     }
+  }
 
-    // 父节点
+  void _handleSingleSelect(Map<String, dynamic> dataModel, bool initial) {
+    if (dataModel['children'] != null && dataModel['children'].isNotEmpty) {
+      return;
+    }
+    // 设置单选
+    currentSelectId = dataModel['id'];
+    if (!initial) {
+      widget.onChecked([dataModel]);
+    }
+  }
+
+  void _handleMultiSelect(Map<String, dynamic> dataModel, bool initial) {
+    int checked = dataModel['checked']!;
+    _toggleCheckState(dataModel, checked);
+
+    // 更新父节点
     if (dataModel[widget.config.parentId]! > 0) {
       updateParentNode(dataModel);
     }
@@ -387,10 +419,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     });
 
     // 获取选中的最小条目
-    List<Map<String, dynamic>> checkedItems = [];
-    sourceTreeMapList.forEach((element) {
-      checkedItems.addAll(getCheckedItems(element, initial: initial));
-    });
+    List<Map<String, dynamic>> checkedItems = _getCheckedItems(initial);
 
     // 调用 onChecked 回调函数
     if (!initial) {
@@ -398,6 +427,30 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
         widget.onChecked(checkedItems);
       });
     }
+  }
+
+  void _toggleCheckState(Map<String, dynamic> dataModel, int checked) {
+    if ((dataModel[widget.config.children] ?? []).isNotEmpty) {
+      var stack = MStack();
+      stack.push(dataModel);
+      while (stack.top > 0) {
+        Map<String, dynamic> node = stack.pop();
+        for (var item in node[widget.config.children] ?? []) {
+          stack.push(item);
+        }
+        node['checked'] = checked == 2 ? 0 : 2;
+      }
+    } else {
+      dataModel['checked'] = checked == 2 ? 0 : 2;
+    }
+  }
+
+  List<Map<String, dynamic>> _getCheckedItems(bool initial) {
+    List<Map<String, dynamic>> checkedItems = [];
+    sourceTreeMapList.forEach((element) {
+      checkedItems.addAll(getCheckedItems(element, initial: initial));
+    });
+    return checkedItems;
   }
 
   /// @params

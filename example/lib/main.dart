@@ -61,6 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool isRTL = false;
   bool isExpanded = false;
+  bool isSingleSelect = true;
 
   @override
   Widget build(BuildContext context) {
@@ -106,6 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: FlutterTreePro(
+                      isSingleSelect: true,
                       isRTL: isRTL,
                       isExpanded: isExpanded,
                       listData: treeListData,
@@ -116,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         label: 'value',
                       ),
                       onChecked: (List<Map<String, dynamic>> checkedList) {
-                        logger.t(checkedList);
+                        logger.i(checkedList);
                         setState(() {
                           _checkedList = checkedList;
                         });
