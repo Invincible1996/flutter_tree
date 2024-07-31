@@ -452,10 +452,10 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
         for (var item in node[widget.config.children] ?? []) {
           stack.push(item);
         }
-        node['checked'] = checked == 2 ? 0 : 2;
+        node['checked'] = checked == 0 ? 2 : 0;
       }
     } else {
-      dataModel['checked'] = checked == 2 ? 0 : 2;
+      dataModel['checked'] = checked == 0 ? 2 : 0;
     }
   }
 
