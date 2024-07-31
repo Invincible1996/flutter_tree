@@ -504,11 +504,6 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     var set2 = Set.from(list1);
     List<Map<String, dynamic>> filterList = List.from(set.difference(set2));
 
-    if (!initial) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onChecked(filterList);
-      });
-    }
 
     return filterList;
   }
