@@ -61,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool isRTL = false;
   bool isExpanded = true;
-  bool isSingleSelect = true;
+  bool isSingleSelect = false;
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     padding: const EdgeInsets.all(8.0),
                     child: FlutterTreePro(
                       initialSelectValue: 1012,
-                      isSingleSelect: true,
+                      isSingleSelect: isSingleSelect,
                       isRTL: isRTL,
                       isExpanded: isExpanded,
                       listData: treeListData,
