@@ -45,3 +45,6 @@
 ## 0.0.12
 - fix single check bug
 - fix onChecked callback
+
+## 0.0.13
+- fix onChecked callback multiple call
