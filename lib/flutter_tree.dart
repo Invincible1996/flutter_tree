@@ -381,9 +381,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   onOpenNode(Map<String, dynamic> model) {
     if ((model[widget.config.children] ?? []).isEmpty) return;
     model['open'] = !model['open'];
-    setState(() {
-      sourceTreeMapList = sourceTreeMapList;
-    });
+    setState(() {});
   }
 
   /// @params
@@ -473,7 +471,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   List<Map<String, dynamic>> getCheckedItems(sourceTreeMap,
       {bool initial = false}) {
     var stack = MStack();
-    var checkedList = [];
+    List<Map<String, dynamic>> checkedList = [];
     stack.push(sourceTreeMap);
     while (stack.top > 0) {
       var node = stack.pop();
@@ -485,7 +483,6 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
         checkedList.add(node);
       }
     }
-
     // List中多余的元素
     var list1 = [];
     for (var value2 in checkedList) {
@@ -508,7 +505,6 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     //     widget.onChecked(filterList);
     //   });
     // }
-
     return filterList;
   }
 
