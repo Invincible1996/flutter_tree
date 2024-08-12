@@ -41,3 +41,7 @@
 
 ## 0.0.11
 - add initial selected value
+
+## 0.0.12
+- fix single check bug
+- fix onChecked callback

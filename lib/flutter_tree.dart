@@ -1,9 +1,8 @@
 library packages;
 
-import 'dart:developer';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
 
 import 'flutter_tree_pro.dart';
 
@@ -44,12 +43,6 @@ class Config {
     this.children = 'children',
   });
 }
-
-var logger = Logger(
-  printer: PrettyPrinter(
-    methodCount: 0,
-  ),
-);
 
 /// @create at 2021/7/15 15:01
 /// @create by kevin
@@ -113,6 +106,11 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   int selectValue = 0;
 
   ///
+  bool _needUpdate = false;
+
+  Timer? _debounceTimer;
+
+  ///
   Map<int, String> checkedMap = {
     0: '',
     1: 'partChecked',
@@ -126,6 +124,16 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   // 单选功能 当前选中的ID
   int currentSelectId = 0;
 
+  void _debouncedUpdate(List<Map<String, dynamic>> checkedItems) {
+    if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+    _debounceTimer = Timer(Duration(milliseconds: 100), () {
+      if (_needUpdate) {
+        widget.onChecked(checkedItems);
+        _needUpdate = false;
+      }
+    });
+  }
+
   @override
   initState() {
     super.initState();
@@ -136,8 +144,6 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
       sourceTreeMapList
         ..clear()
         ..addAll(list);
-      log(sourceTreeMapList.toString());
-      logger.t(sourceTreeMapList);
       sourceTreeMapList.forEach((element) {
         factoryTreeData(element);
       });
@@ -340,20 +346,12 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   }
 
   Icon _buildSingleSelectIcon(Map<String, dynamic> e) {
-    if (e['children'] == null || e['children'].isEmpty) {
-      return Icon(
-        currentSelectId == e['id']
-            ? Icons.check_box
-            : Icons.check_box_outline_blank,
-        color:
-            currentSelectId == e['id'] ? Color(0X990000FF) : Color(0XFFCCCCCC),
-      );
-    } else {
-      return Icon(
-        Icons.check_box_outline_blank,
-        color: Color(0XFFCCCCCC),
-      );
-    }
+    return Icon(
+      currentSelectId == e['id']
+          ? Icons.check_box
+          : Icons.check_box_outline_blank,
+      color: currentSelectId == e['id'] ? Color(0X990000FF) : Color(0XFFCCCCCC),
+    );
   }
 
   Icon _buildMultiSelectIcon(Map<String, dynamic> e) {
@@ -408,9 +406,6 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   }
 
   void _handleSingleSelect(Map<String, dynamic> dataModel, bool initial) {
-    if (dataModel['children'] != null && dataModel['children'].isNotEmpty) {
-      return;
-    }
     // 设置单选
     currentSelectId = dataModel['id'];
     if (!initial) {
@@ -431,14 +426,18 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     });
 
     // 获取选中的最小条目
-    List<Map<String, dynamic>> checkedItems = _getCheckedItems(initial);
+    if (!initial) {
+      _needUpdate = true;
+      List<Map<String, dynamic>> checkedItems = _getCheckedItems(initial);
+      _debouncedUpdate(checkedItems);
+    }
 
     // 调用 onChecked 回调函数
-    if (!initial) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onChecked(checkedItems);
-      });
-    }
+    // if (!initial) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     widget.onChecked(checkedItems);
+    //   });
+    // }
   }
 
   void _toggleCheckState(Map<String, dynamic> dataModel, int checked) {
@@ -484,8 +483,29 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
         checkedList.add(node);
       }
     }
+    // List中多余的元素
+    var list1 = [];
+    for (var value2 in checkedList) {
+      if (value2['children'] != null && value2['children'].isNotEmpty) {
+        for (var value in checkedList) {
+          if (value2['id'] == value['parentId']) {
+            list1.add(value);
+          }
+        }
+      }
+    }
 
-    return checkedList;
+    // 移除List中多余的元素
+    var set = Set.from(checkedList);
+    var set2 = Set.from(list1);
+    List<Map<String, dynamic>> filterList = List.from(set.difference(set2));
+
+    // if (!initial) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     widget.onChecked(filterList);
+    //   });
+    // }
+    return filterList;
   }
 
   /// @params

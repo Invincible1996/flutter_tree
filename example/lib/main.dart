@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -119,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         label: 'value',
                       ),
                       onChecked: (List<Map<String, dynamic>> checkedList) {
-                        logger.i(checkedList);
+                        log('checkedList: $checkedList');
                         setState(() {
                           _checkedList = checkedList;
                         });
