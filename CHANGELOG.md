@@ -48,3 +48,6 @@
 
 ## 0.0.13
 - fix onChecked callback multiple call
+
+## 0.0.14
+- fix key cannot be String
