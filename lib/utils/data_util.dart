@@ -9,7 +9,7 @@ class DataUtil {
   /// @desc  List to map
   static Map<String, dynamic> transformListToMap(List dataList, Config config) {
     Map obj = {};
-    int? rootId;
+    dynamic rootId;
     dataList.forEach((v) {
       // 根节点
       if (v[config.parentId] != 0) {
@@ -37,7 +37,7 @@ class DataUtil {
 
   static List<Map<String, dynamic>> convertData(
       List<Map<String, dynamic>> data) {
-    Map<int, Map<String, dynamic>> idMap = {};
+    Map<dynamic, Map<String, dynamic>> idMap = {};
 
     // 首先将数据映射到一个 Map 中，键为 id，值为对应的数据项
     for (Map<String, dynamic> item in data) {
@@ -48,7 +48,7 @@ class DataUtil {
 
     // 遍历每个数据项
     for (Map<String, dynamic> item in data) {
-      int parentId = item['parentId'];
+      var parentId = item['parentId'];
 
       // 如果当前项的父级 ID 不存在于数据中，则它是根节点
       if (!idMap.containsKey(parentId)) {
