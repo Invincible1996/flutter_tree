@@ -1,3 +1,7 @@
+## 0.0.16
+- docs: rewrite README with complete usage and API sections
+- docs: add local demo gif asset and reference it in README
+
 ## 0.0.15
 - feat: support dragging leaf nodes to reorder tree hierarchy
 - support dropping on parent to append as child
