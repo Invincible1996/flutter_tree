@@ -99,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             isRTL = value;
                           });
                         },
-                        activeColor: Colors.indigo,
+                        activeTrackColor: Colors.indigo,
                       ),
                     ],
                   ),
@@ -118,6 +118,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         parentId: 'parentId',
                         dataType: DataType.DataList,
                         label: 'value',
+                        lineStyle: TreeLineStyle(
+                          color: Color(0xFFE0E0E0),
+                          width: 1.0,
+                          indent: 28,
+                          showVerticalLine: true,
+                          showHorizontalLine: true,
+                        ),
                       ),
                       onChecked: (List<Map<String, dynamic>> checkedList) {
                         log('checkedList: $checkedList');

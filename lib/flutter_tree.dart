@@ -6,9 +6,49 @@ import 'package:flutter/material.dart';
 
 import 'flutter_tree_pro.dart';
 
-enum DataType {
-  DataList,
-  DataMap,
+enum DataType { DataList, DataMap }
+
+/// 节点选中状态
+enum CheckState {
+  unchecked(0),
+  partial(1),
+  checked(2);
+
+  final int value;
+  const CheckState(this.value);
+
+  static CheckState fromValue(int? value) {
+    return CheckState.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => CheckState.unchecked,
+    );
+  }
+}
+
+/// 树形连接线样式
+class TreeLineStyle {
+  /// 线条颜色
+  final Color color;
+
+  /// 线条宽度
+  final double width;
+
+  /// 缩进宽度（每一级的间距）
+  final double indent;
+
+  /// 是否显示竖线
+  final bool showVerticalLine;
+
+  /// 是否显示水平连接线
+  final bool showHorizontalLine;
+
+  const TreeLineStyle({
+    this.color = const Color(0xFFD9D9D9),
+    this.width = 1.0,
+    this.indent = 24.0,
+    this.showVerticalLine = true,
+    this.showHorizontalLine = true,
+  });
 }
 
 /// @create at 2021/7/15 15:01
@@ -16,7 +56,6 @@ enum DataType {
 /// @desc  参数类型配置
 class Config {
   ///数据类型
-
   final DataType dataType;
 
   ///父级id key
@@ -34,6 +73,9 @@ class Config {
   ///
   final String children;
 
+  /// 树形连接线样式
+  final TreeLineStyle lineStyle;
+
   const Config({
     this.dataType = DataType.DataMap,
     this.parentId = 'parentId',
@@ -41,6 +83,7 @@ class Config {
     this.label = 'label',
     this.id = 'id',
     this.children = 'children',
+    this.lineStyle = const TreeLineStyle(),
   });
 }
 
@@ -96,30 +139,26 @@ class FlutterTreePro extends StatefulWidget {
 }
 
 class _FlutterTreeProState extends State<FlutterTreePro> {
-  ///
   List<Map<String, dynamic>> sourceTreeMapList = [];
-
-  ///
   bool checkedBox = false;
-
-  ///
   int selectValue = 0;
-
-  ///
   bool _needUpdate = false;
 
   Timer? _debounceTimer;
 
-  ///
-  Map<int, String> checkedMap = {
-    0: '',
-    1: 'partChecked',
-    2: 'checked',
-  };
+  /// 获取节点的选中状态
+  CheckState _getCheckState(Map<String, dynamic> item) {
+    return CheckState.fromValue(item['checked'] as int?);
+  }
+
+  /// 设置节点的选中状态
+  void _setCheckState(Map<String, dynamic> item, CheckState state) {
+    item['checked'] = state.value;
+  }
 
   /// @params
   /// @desc expand map tree to map
-  Map treeMap = {};
+  Map<dynamic, Map<String, dynamic>> treeMap = {};
 
   // 单选功能 当前选中的ID
   int currentSelectId = 0;
@@ -135,12 +174,18 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   }
 
   @override
-  initState() {
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
     super.initState();
     currentSelectId = widget.initialSelectValue;
     // set default select
     if (widget.config.dataType == DataType.DataList) {
-      final list = DataUtil.convertData(widget.listData);
+      final list = DataUtil.convertData(widget.listData, widget.config);
       sourceTreeMapList
         ..clear()
         ..addAll(list);
@@ -148,7 +193,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
         factoryTreeData(element);
       });
       widget.initialListData.forEach((element) {
-        element['checked'] = 0;
+        element['checked'] = CheckState.unchecked.value;
       });
       if (widget.isSingleSelect) {
         for (var item in treeMap.values.toList()) {
@@ -170,6 +215,9 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
       }
     } else {
       sourceTreeMapList = widget.treeData;
+      if (sourceTreeMapList.isEmpty && widget.initialTreeData.isNotEmpty) {
+        sourceTreeMapList = [widget.initialTreeData];
+      }
       sourceTreeMapList.forEach((element) {
         factoryTreeData(element);
       });
@@ -178,8 +226,8 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
 
   /// @params
   /// @desc set current item checked
-  setCheckStatus(item) {
-    item['checked'] = 2;
+  void setCheckStatus(Map<String, dynamic> item) {
+    _setCheckState(item, CheckState.checked);
     if (item['children'] != null) {
       item['children'].forEach((element) {
         setCheckStatus(element);
@@ -189,9 +237,9 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
 
   /// @params
   /// @desc expand tree data to map
-  factoryTreeData(treeModel) {
+  void factoryTreeData(Map<String, dynamic> treeModel) {
     treeModel['open'] = widget.isExpanded;
-    treeModel['checked'] = 0;
+    treeModel['checked'] = CheckState.unchecked.value;
     treeMap.putIfAbsent(treeModel[widget.config.id], () => treeModel);
     (treeModel[widget.config.children] ?? []).forEach((element) {
       factoryTreeData(element);
@@ -200,63 +248,68 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
 
   /// @params
   /// @desc render parent
-  buildTreeParent(sourceTreeMap) {
+  Widget buildTreeParent(Map<String, dynamic> sourceTreeMap, {int depth = 0}) {
+    final lineStyle = widget.config.lineStyle;
+    final hasChildren =
+        (sourceTreeMap[widget.config.children] ?? []).isNotEmpty;
+
     return Column(
       children: [
         GestureDetector(
           onTap: () => onOpenNode(sourceTreeMap),
           child: Container(
             width: MediaQuery.of(context).size.width,
-            padding: EdgeInsets.only(
-              left: 20,
-              top: 15,
-            ),
+            padding: EdgeInsets.only(left: lineStyle.indent, top: 15),
             child: Column(
               children: [
                 Row(
-                  textDirection:
-                      widget.isRTL ? TextDirection.rtl : TextDirection.ltr,
+                  textDirection: widget.isRTL
+                      ? TextDirection.rtl
+                      : TextDirection.ltr,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    (sourceTreeMap[widget.config.children] ?? []).isNotEmpty
+                    // 绘制层级连接线
+                    if (lineStyle.showVerticalLine && depth > 0)
+                      _buildParentIndentLines(depth),
+                    // 展开/折叠图标
+                    hasChildren
                         ? Icon(
                             (sourceTreeMap['open'] ?? false)
                                 ? Icons.keyboard_arrow_down_rounded
                                 : (widget.isRTL
-                                    ? Icons.keyboard_arrow_left_rounded
-                                    : Icons.keyboard_arrow_right_rounded),
+                                      ? Icons.keyboard_arrow_left_rounded
+                                      : Icons.keyboard_arrow_right_rounded),
                             size: 20,
                           )
-                        : SizedBox(
-                            width: widget.isRTL ? 30 : 0,
-                          ),
-                    SizedBox(
-                      width: 5,
-                    ),
+                        : SizedBox(width: widget.isRTL ? 30 : 20),
+                    SizedBox(width: 5),
                     GestureDetector(
                       onTap: () {
                         selectCheckedBox(sourceTreeMap);
                       },
                       child: buildCheckBoxIcon(sourceTreeMap),
                     ),
-                    SizedBox(
-                      width: 5,
-                    ),
+                    SizedBox(width: 5),
                     Expanded(
                       child: Text(
-                        textAlign:
-                            widget.isRTL ? TextAlign.end : TextAlign.start,
+                        textAlign: widget.isRTL
+                            ? TextAlign.end
+                            : TextAlign.start,
                         '${sourceTreeMap[widget.config.label]}',
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
                   ],
                 ),
-                (sourceTreeMap['open'] ?? false)
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: buildTreeNode(sourceTreeMap),
-                      )
-                    : SizedBox.shrink(),
+                if (sourceTreeMap['open'] ?? false)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: buildTreeNode(
+                      sourceTreeMap,
+                      depth: depth + 1,
+                      parentIsLastList: const [],
+                    ),
+                  ),
               ],
             ),
           ),
@@ -267,72 +320,155 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
 
   /// @params
   /// @desc render item
-  buildTreeNode(Map<String, dynamic> data) {
-    return (data[widget.config.children] ?? []).map<Widget>(
-      (e) {
-        return GestureDetector(
-          onTap: () => onOpenNode(e),
-          child: Container(
-            color: Colors.white,
-            // width: MediaQuery.of(context).size.width,
-            padding: EdgeInsets.only(left: 20, top: 15),
-            child: Column(
-              textDirection: TextDirection.rtl,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Row(
-                  textDirection:
-                      widget.isRTL ? TextDirection.rtl : TextDirection.ltr,
-                  children: [
-                    SizedBox(
-                      width: widget.isRTL ? 20 : 0,
-                    ),
-                    (e[widget.config.children] ?? []).isNotEmpty
-                        ? Icon(
-                            (e['open'] ?? false)
-                                ? Icons.keyboard_arrow_down_rounded
-                                : (widget.isRTL
+  List<Widget> buildTreeNode(
+    Map<String, dynamic> data, {
+    int depth = 1,
+    List<bool> parentIsLastList = const [],
+  }) {
+    final lineStyle = widget.config.lineStyle;
+    final children = data[widget.config.children] ?? [];
+
+    return children.map<Widget>((e) {
+      final hasChildren = (e[widget.config.children] ?? []).isNotEmpty;
+      final isLast = children.last == e;
+      // 传递当前节点的 isLast 状态给子节点
+      final currentParentList = [...parentIsLastList, isLast];
+
+      return GestureDetector(
+        onTap: () => onOpenNode(e),
+        child: Container(
+          color: Colors.white,
+          padding: EdgeInsets.only(left: 0, top: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                textDirection: widget.isRTL
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // 绘制层级连接线
+                  if (lineStyle.showVerticalLine && depth > 0)
+                    _buildNodeIndentLines(depth, parentIsLastList, isLast),
+                  // 展开/折叠图标
+                  hasChildren
+                      ? Icon(
+                          (e['open'] ?? false)
+                              ? Icons.keyboard_arrow_down_rounded
+                              : (widget.isRTL
                                     ? Icons.keyboard_arrow_left_rounded
                                     : Icons.keyboard_arrow_right_rounded),
-                            size: 20,
-                          )
-                        : SizedBox(
-                            width: widget.isRTL ? 30 : 10,
-                          ),
-                    SizedBox(
-                      width: 5,
+                          size: 20,
+                        )
+                      : SizedBox(width: 20),
+                  SizedBox(width: 5),
+                  GestureDetector(
+                    onTap: () {
+                      selectCheckedBox(e);
+                    },
+                    child: buildCheckBoxIcon(e),
+                  ),
+                  SizedBox(width: 5),
+                  Expanded(
+                    child: Text(
+                      '${e[widget.config.label]}',
+                      textAlign: widget.isRTL ? TextAlign.end : TextAlign.start,
+                      style: TextStyle(fontSize: 16),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        selectCheckedBox(e);
-                      },
-                      child: buildCheckBoxIcon(e),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                      child: Text(
-                        '${e[widget.config.label]}',
-                        textAlign:
-                            widget.isRTL ? TextAlign.end : TextAlign.start,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ],
+                  ),
+                ],
+              ),
+              if (e['open'] ?? false)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: buildTreeNode(
+                    e,
+                    depth: depth + 1,
+                    parentIsLastList: currentParentList,
+                  ),
                 ),
-                (e['open'] ?? false)
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: buildTreeNode(e),
-                      )
-                    : SizedBox.shrink(),
-              ],
-            ),
+            ],
           ),
-        );
-      },
-    ).toList();
+        ),
+      );
+    }).toList();
+  }
+
+  /// 构建节点缩进竖线（带拐角效果）
+  ///
+  /// [depth] - 当前深度
+  /// [parentIsLastList] - 每一层父节点是否是最后一个的列表
+  /// [isLast] - 当前节点是否是最后一个
+  Widget _buildNodeIndentLines(
+    int depth,
+    List<bool> parentIsLastList,
+    bool isLast,
+  ) {
+    final lineStyle = widget.config.lineStyle;
+    final indent = lineStyle.indent;
+
+    return SizedBox(
+      width: indent * depth,
+      height: 24,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: List.generate(depth, (index) {
+          // 当前层级的父节点是否是最后一个
+          final parentIsLast = index < parentIsLastList.length
+              ? parentIsLastList[index]
+              : false;
+          // 是否是当前绘制的最后一层（即连接当前节点的线）
+          final isCurrentLevel = index == depth - 1;
+
+          return Container(
+            width: indent,
+            height: double.infinity,
+            child: CustomPaint(
+              painter: _TreeLinePainter(
+                color: lineStyle.color,
+                strokeWidth: lineStyle.width,
+                isParentLast: parentIsLast,
+                isCurrentLevel: isCurrentLevel,
+                isLastNode: isLast,
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  /// 构建父节点缩进竖线（用于根节点被嵌套的情况）
+  Widget _buildParentIndentLines(int depth) {
+    final lineStyle = widget.config.lineStyle;
+    final indent = lineStyle.indent;
+
+    return SizedBox(
+      width: indent * depth,
+      height: 24,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(depth, (index) {
+          final isLastLevel = index == depth - 1;
+
+          return Container(
+            width: indent,
+            height: double.infinity,
+            child: CustomPaint(
+              painter: _TreeLinePainter(
+                color: lineStyle.color,
+                strokeWidth: lineStyle.width,
+                isParentLast: false, // 父节点不是最后一个，画完整竖线
+                isCurrentLevel: isLastLevel,
+                isLastNode: false, // 不是最后一个节点，画T形
+              ),
+            ),
+          );
+        }),
+      ),
+    );
   }
 
   /// @params
@@ -355,30 +491,20 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   }
 
   Icon _buildMultiSelectIcon(Map<String, dynamic> e) {
-    switch (e['checked'] ?? 0) {
-      case 0:
-        return Icon(
-          Icons.check_box_outline_blank,
-          color: Color(0XFFCCCCCC),
-        );
-      case 1:
-        return Icon(
-          Icons.indeterminate_check_box,
-          color: Color(0X990000FF),
-        );
-      case 2:
-        return Icon(
-          Icons.check_box,
-          color: Color(0X990000FF),
-        );
-      default:
-        return Icon(Icons.remove);
+    final state = _getCheckState(e);
+    switch (state) {
+      case CheckState.unchecked:
+        return Icon(Icons.check_box_outline_blank, color: Color(0XFFCCCCCC));
+      case CheckState.partial:
+        return Icon(Icons.indeterminate_check_box, color: Color(0X990000FF));
+      case CheckState.checked:
+        return Icon(Icons.check_box, color: Color(0X990000FF));
     }
   }
 
   /// @params
   /// @desc expand item if has item has children
-  onOpenNode(Map<String, dynamic> model) {
+  void onOpenNode(Map<String, dynamic> model) {
     if ((model[widget.config.children] ?? []).isEmpty) return;
     model['open'] = !model['open'];
     setState(() {});
@@ -386,18 +512,17 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
 
   /// @params
   /// @desc
-  selectNode(Map<String, dynamic> dataModel) {
+  void selectNode(Map<String, dynamic> dataModel) {
     setState(() {
       selectValue = dataModel['value']!;
     });
   }
 
-  /// @params
-  /// @desc 选中帅选框
-  /// @params
-  /// @desc 选中帅选框
-  void selectCheckedBox(Map<String, dynamic> dataModel,
-      {bool initial = false}) {
+  /// 选中复选框
+  void selectCheckedBox(
+    Map<String, dynamic> dataModel, {
+    bool initial = false,
+  }) {
     if (widget.isSingleSelect) {
       _handleSingleSelect(dataModel, initial);
     } else {
@@ -414,8 +539,8 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   }
 
   void _handleMultiSelect(Map<String, dynamic> dataModel, bool initial) {
-    int checked = dataModel['checked']!;
-    _toggleCheckState(dataModel, checked);
+    final currentState = _getCheckState(dataModel);
+    _toggleCheckState(dataModel, currentState);
 
     // 更新父节点
     if (dataModel[widget.config.parentId]! > 0) {
@@ -440,7 +565,13 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     // }
   }
 
-  void _toggleCheckState(Map<String, dynamic> dataModel, int checked) {
+  void _toggleCheckState(
+    Map<String, dynamic> dataModel,
+    CheckState currentState,
+  ) {
+    final newState = currentState == CheckState.unchecked
+        ? CheckState.checked
+        : CheckState.unchecked;
     if ((dataModel[widget.config.children] ?? []).isNotEmpty) {
       var stack = MStack();
       stack.push(dataModel);
@@ -449,10 +580,10 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
         for (var item in node[widget.config.children] ?? []) {
           stack.push(item);
         }
-        node['checked'] = checked == 0 ? 2 : 0;
+        _setCheckState(node, newState);
       }
     } else {
-      dataModel['checked'] = checked == 0 ? 2 : 0;
+      _setCheckState(dataModel, newState);
     }
   }
 
@@ -464,12 +595,11 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     return checkedItems;
   }
 
-  /// @params
-  /// @desc 获取选中的条目
-  /// @params
-  /// @desc 获取选中的条目
-  List<Map<String, dynamic>> getCheckedItems(sourceTreeMap,
-      {bool initial = false}) {
+  /// 获取选中的条目
+  List<Map<String, dynamic>> getCheckedItems(
+    sourceTreeMap, {
+    bool initial = false,
+  }) {
     var stack = MStack();
     List<Map<String, dynamic>> checkedList = [];
     stack.push(sourceTreeMap);
@@ -478,7 +608,7 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
       for (var item in (node[widget.config.children] ?? [])) {
         stack.push(item);
       }
-      if (node['checked'] == 2 &&
+      if (_getCheckState(node) == CheckState.checked &&
           (node[widget.config.children] ?? []).isEmpty) {
         checkedList.add(node);
       }
@@ -509,16 +639,17 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
   }
 
   /// @params
-  /// @desc
-  updateParentNode(Map<String, dynamic> dataModel) {
+  /// @desc 更新父节点选中状态
+  void updateParentNode(Map<String, dynamic> dataModel) {
     var par = treeMap[dataModel[widget.config.parentId]];
     if (par == null) return;
     int checkLen = 0;
     bool partChecked = false;
     for (var item in (par[widget.config.children] ?? [])) {
-      if (item['checked'] == 2) {
+      final state = _getCheckState(item);
+      if (state == CheckState.checked) {
         checkLen++;
-      } else if (item['checked'] == 1) {
+      } else if (state == CheckState.partial) {
         partChecked = true;
         break;
       }
@@ -526,18 +657,17 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
 
     // 如果子孩子全都是选择的， 父节点就全选
     if (checkLen == (par[widget.config.children] ?? []).length) {
-      par['checked'] = 2;
+      _setCheckState(par, CheckState.checked);
     } else if (partChecked ||
         (checkLen < (par[widget.config.children] ?? []).length &&
             checkLen > 0)) {
-      par['checked'] = 1;
+      _setCheckState(par, CheckState.partial);
     } else {
-      par['checked'] = 0;
+      _setCheckState(par, CheckState.unchecked);
     }
 
-    // 如果还有父节点 解析往上更新
-    if (treeMap[par[widget.config.parentId]] != null ||
-        treeMap[par[widget.config.parentId]] == 0) {
+    // 如果还有父节点 继续往上更新
+    if (treeMap[par[widget.config.parentId]] != null) {
       updateParentNode(par);
     }
   }
@@ -549,10 +679,89 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
       child: SingleChildScrollView(
         child: Column(
           children: sourceTreeMapList.map<Widget>((e) {
-            return buildTreeParent(e);
+            return buildTreeParent(e, depth: 0);
           }).toList(),
         ),
       ),
     );
+  }
+}
+
+/// 树形连接线绘制器 - 实现 T 形/L 形连接线
+class _TreeLinePainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+  // 父节点是否是最后一个（决定竖线是否贯穿）
+  final bool isParentLast;
+  // 是否是当前连接层级（最后一层需要画横线）
+  final bool isCurrentLevel;
+  // 当前节点是否是最后一个（决定最后一层的竖线长度）
+  final bool isLastNode;
+
+  _TreeLinePainter({
+    required this.color,
+    required this.strokeWidth,
+    this.isParentLast = false,
+    this.isCurrentLevel = false,
+    this.isLastNode = false,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.square;
+
+    // 连接线起点（从左侧开始）
+    final startX = 0.0;
+    // 连接线中心点（图标位置）
+    final centerX = size.width / 2;
+    // 垂直中心
+    final centerY = size.height / 2;
+
+    if (isCurrentLevel) {
+      // 当前层级：需要画横线连接到节点
+      if (isLastNode) {
+        // L 形：┖ 竖线只画上半部分，然后横线
+        // 垂直线（从顶部到中心）
+        canvas.drawLine(Offset(startX, 0), Offset(startX, centerY), paint);
+        // 水平线（从垂直线到右侧）
+        canvas.drawLine(
+          Offset(startX, centerY),
+          Offset(centerX, centerY),
+          paint,
+        );
+      } else {
+        // T 形：├ 竖线贯穿，然后横线
+        // 垂直线（完整）
+        canvas.drawLine(Offset(startX, 0), Offset(startX, size.height), paint);
+        // 水平线（从垂直线到右侧）
+        canvas.drawLine(
+          Offset(startX, centerY),
+          Offset(centerX, centerY),
+          paint,
+        );
+      }
+    } else {
+      // 非当前层级：只画竖线
+      if (isParentLast) {
+        // 父节点是最后一个，不需要画竖线（空格）
+        // 不绘制任何线条
+      } else {
+        // 父节点不是最后一个，需要画贯穿的竖线
+        canvas.drawLine(Offset(startX, 0), Offset(startX, size.height), paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _TreeLinePainter oldDelegate) {
+    return oldDelegate.color != color ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.isParentLast != isParentLast ||
+        oldDelegate.isCurrentLevel != isCurrentLevel ||
+        oldDelegate.isLastNode != isLastNode;
   }
 }
