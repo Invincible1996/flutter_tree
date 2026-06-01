@@ -1,3 +1,8 @@
+## 0.0.15
+- feat: support dragging leaf nodes to reorder tree hierarchy
+- support dropping on parent to append as child
+- support dropping on leaf to insert as next sibling
+
 ## 0.0.1
 
 - Describe initial release.
