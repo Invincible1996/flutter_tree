@@ -1,0 +1,48 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Verify Flutter
+        run: flutter --version
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Setup pub credentials
+        run: |
+          mkdir -p "$HOME/.config/dart"
+          cat > "$HOME/.config/dart/pub-credentials.json" <<EOF
+          {
+            "accessToken": "${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}",
+            "refreshToken": "${{ secrets.PUB_DEV_PUBLISH_REFRESH_TOKEN }}",
+            "tokenEndpoint": "${{ secrets.PUB_DEV_PUBLISH_TOKEN_ENDPOINT }}",
+            "scopes": ["openid", "https://www.googleapis.com/auth/userinfo.email"]
+          }
+          EOF
+
+      - name: Publish dry-run
+        run: flutter pub publish --dry-run
+
+      - name: Publish to pub.dev
+        run: flutter pub publish -f
