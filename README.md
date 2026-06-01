@@ -2,6 +2,10 @@
 
 A Flutter tree-select widget with checkbox selection, single-select mode, RTL support, and leaf-node drag-and-drop.
 
+## Demo
+
+![flutter_tree demo](assets/tree_demo.gif)
+
 ## Features
 
 - Build tree data from flat list (`DataType.DataList`) or nested map (`DataType.DataMap`)
