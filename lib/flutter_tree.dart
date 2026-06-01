@@ -246,6 +246,119 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
     });
   }
 
+  bool _isLeafNode(Map<String, dynamic> node) {
+    return (node[widget.config.children] ?? []).isEmpty;
+  }
+
+  bool _canAcceptDrop(
+    Map<String, dynamic>? draggedNode,
+    Map<String, dynamic> targetNode,
+  ) {
+    if (draggedNode == null) return false;
+    if (!_isLeafNode(draggedNode)) return false;
+    if (draggedNode[widget.config.id] == targetNode[widget.config.id]) {
+      return false;
+    }
+    if (draggedNode[widget.config.parentId] == targetNode[widget.config.id]) {
+      return false;
+    }
+    return true;
+  }
+
+  void _onLeafDropped(
+    Map<String, dynamic> draggedNode,
+    Map<String, dynamic> targetNode,
+  ) {
+    if (!_canAcceptDrop(draggedNode, targetNode)) return;
+    _moveLeafNodeByDropPosition(draggedNode, targetNode);
+  }
+
+  void _moveLeafNodeByDropPosition(
+    Map<String, dynamic> draggedNode,
+    Map<String, dynamic> targetNode,
+  ) {
+    final draggedId = draggedNode[widget.config.id];
+    final oldParentId = draggedNode[widget.config.parentId];
+    final targetId = targetNode[widget.config.id];
+    final targetParentId = targetNode[widget.config.parentId];
+    if (draggedId == null || targetId == null) return;
+
+    final dropOnLeaf = _isLeafNode(targetNode);
+    final dynamic newParentId = dropOnLeaf ? targetParentId : targetId;
+    if (oldParentId == newParentId && !dropOnLeaf) return;
+
+    final oldParent = treeMap[oldParentId];
+    if (oldParent != null) {
+      final oldChildren = (oldParent[widget.config.children] ?? []) as List;
+      oldChildren.removeWhere((item) => item[widget.config.id] == draggedId);
+    } else {
+      sourceTreeMapList.removeWhere(
+        (item) => item[widget.config.id] == draggedId,
+      );
+    }
+
+    if (dropOnLeaf) {
+      if (newParentId == null || newParentId == 0) {
+        final insertIndex = sourceTreeMapList.indexWhere(
+          (item) => item[widget.config.id] == targetId,
+        );
+        if (insertIndex == -1) {
+          sourceTreeMapList.add(draggedNode);
+        } else {
+          sourceTreeMapList.insert(insertIndex + 1, draggedNode);
+        }
+      } else {
+        final parentNode = treeMap[newParentId];
+        if (parentNode == null) return;
+        final siblings =
+            parentNode.putIfAbsent(widget.config.children, () => []) as List;
+        final insertIndex = siblings.indexWhere(
+          (item) => item[widget.config.id] == targetId,
+        );
+        if (insertIndex == -1) {
+          siblings.add(draggedNode);
+        } else {
+          siblings.insert(insertIndex + 1, draggedNode);
+        }
+        parentNode['open'] = true;
+      }
+    } else {
+      final targetChildren =
+          targetNode.putIfAbsent(widget.config.children, () => []) as List;
+      targetChildren.add(draggedNode);
+      targetNode['open'] = true;
+    }
+
+    draggedNode[widget.config.parentId] = newParentId;
+
+    _rebuildTreeMapWithoutReset();
+    _notifyCheckedAfterStructureChange();
+    setState(() {});
+  }
+
+  void _rebuildTreeMapWithoutReset() {
+    treeMap.clear();
+    for (final root in sourceTreeMapList) {
+      _indexTreeNode(root);
+    }
+  }
+
+  void _indexTreeNode(Map<String, dynamic> node) {
+    treeMap[node[widget.config.id]] = node;
+    for (final child in (node[widget.config.children] ?? [])) {
+      _indexTreeNode(child as Map<String, dynamic>);
+    }
+  }
+
+  void _notifyCheckedAfterStructureChange() {
+    if (widget.isSingleSelect) {
+      final selected = treeMap[currentSelectId];
+      widget.onChecked(selected == null ? [] : [selected]);
+      return;
+    }
+    widget.onChecked(_getCheckedItems(false));
+  }
+
   /// @params
   /// @desc render parent
   Widget buildTreeParent(Map<String, dynamic> sourceTreeMap, {int depth = 0}) {
@@ -255,64 +368,118 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
 
     return Column(
       children: [
-        GestureDetector(
-          onTap: () => onOpenNode(sourceTreeMap),
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            padding: EdgeInsets.only(left: lineStyle.indent, top: 15),
-            child: Column(
-              children: [
-                Row(
-                  textDirection: widget.isRTL
-                      ? TextDirection.rtl
-                      : TextDirection.ltr,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+        DragTarget<Map<String, dynamic>>(
+          onWillAcceptWithDetails: (details) {
+            return _canAcceptDrop(details.data, sourceTreeMap);
+          },
+          onAcceptWithDetails: (details) {
+            _onLeafDropped(details.data, sourceTreeMap);
+          },
+          builder: (context, candidateData, rejectedData) {
+            return GestureDetector(
+              onTap: () => onOpenNode(sourceTreeMap),
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.only(left: lineStyle.indent, top: 15),
+                color: candidateData.isNotEmpty
+                    ? const Color(0xFFE8F5E9)
+                    : Colors.white,
+                child: Column(
                   children: [
-                    // 绘制层级连接线
-                    if (lineStyle.showVerticalLine && depth > 0)
-                      _buildParentIndentLines(depth),
-                    // 展开/折叠图标
-                    hasChildren
-                        ? Icon(
-                            (sourceTreeMap['open'] ?? false)
-                                ? Icons.keyboard_arrow_down_rounded
-                                : (widget.isRTL
-                                      ? Icons.keyboard_arrow_left_rounded
-                                      : Icons.keyboard_arrow_right_rounded),
-                            size: 20,
-                          )
-                        : SizedBox(width: widget.isRTL ? 30 : 20),
-                    SizedBox(width: 5),
-                    GestureDetector(
-                      onTap: () {
-                        selectCheckedBox(sourceTreeMap);
-                      },
-                      child: buildCheckBoxIcon(sourceTreeMap),
+                    Row(
+                      textDirection: widget.isRTL
+                          ? TextDirection.rtl
+                          : TextDirection.ltr,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // 绘制层级连接线
+                        if (lineStyle.showVerticalLine && depth > 0)
+                          _buildParentIndentLines(depth),
+                        // 展开/折叠图标
+                        hasChildren
+                            ? Icon(
+                                (sourceTreeMap['open'] ?? false)
+                                    ? Icons.keyboard_arrow_down_rounded
+                                    : (widget.isRTL
+                                          ? Icons.keyboard_arrow_left_rounded
+                                          : Icons.keyboard_arrow_right_rounded),
+                                size: 20,
+                              )
+                            : SizedBox(width: widget.isRTL ? 30 : 20),
+                        SizedBox(width: 5),
+                        GestureDetector(
+                          onTap: () {
+                            selectCheckedBox(sourceTreeMap);
+                          },
+                          child: buildCheckBoxIcon(sourceTreeMap),
+                        ),
+                        SizedBox(width: 5),
+                        Expanded(
+                          child: _isLeafNode(sourceTreeMap)
+                              ? Draggable<Map<String, dynamic>>(
+                                  data: sourceTreeMap,
+                                  feedback: Material(
+                                    color: Colors.transparent,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: const Color(0xFF90CAF9),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        '${sourceTreeMap[widget.config.label]}',
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ),
+                                  ),
+                                  childWhenDragging: Opacity(
+                                    opacity: 0.4,
+                                    child: Text(
+                                      textAlign: widget.isRTL
+                                          ? TextAlign.end
+                                          : TextAlign.start,
+                                      '${sourceTreeMap[widget.config.label]}',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    textAlign: widget.isRTL
+                                        ? TextAlign.end
+                                        : TextAlign.start,
+                                    '${sourceTreeMap[widget.config.label]}',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                )
+                              : Text(
+                                  textAlign: widget.isRTL
+                                      ? TextAlign.end
+                                      : TextAlign.start,
+                                  '${sourceTreeMap[widget.config.label]}',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 5),
-                    Expanded(
-                      child: Text(
-                        textAlign: widget.isRTL
-                            ? TextAlign.end
-                            : TextAlign.start,
-                        '${sourceTreeMap[widget.config.label]}',
-                        style: TextStyle(fontSize: 16),
+                    if (sourceTreeMap['open'] ?? false)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: buildTreeNode(
+                          sourceTreeMap,
+                          depth: depth + 1,
+                          parentIsLastList: const [],
+                        ),
                       ),
-                    ),
                   ],
                 ),
-                if (sourceTreeMap['open'] ?? false)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: buildTreeNode(
-                      sourceTreeMap,
-                      depth: depth + 1,
-                      parentIsLastList: const [],
-                    ),
-                  ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -334,63 +501,118 @@ class _FlutterTreeProState extends State<FlutterTreePro> {
       // 传递当前节点的 isLast 状态给子节点
       final currentParentList = [...parentIsLastList, isLast];
 
-      return GestureDetector(
-        onTap: () => onOpenNode(e),
-        child: Container(
-          color: Colors.white,
-          padding: EdgeInsets.only(left: 0, top: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                textDirection: widget.isRTL
-                    ? TextDirection.rtl
-                    : TextDirection.ltr,
-                crossAxisAlignment: CrossAxisAlignment.center,
+      return DragTarget<Map<String, dynamic>>(
+        onWillAcceptWithDetails: (details) {
+          return _canAcceptDrop(details.data, e);
+        },
+        onAcceptWithDetails: (details) {
+          _onLeafDropped(details.data, e);
+        },
+        builder: (context, candidateData, rejectedData) {
+          return GestureDetector(
+            onTap: () => onOpenNode(e),
+            child: Container(
+              color: candidateData.isNotEmpty
+                  ? const Color(0xFFE8F5E9)
+                  : Colors.white,
+              padding: EdgeInsets.only(left: 0, top: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 绘制层级连接线
-                  if (lineStyle.showVerticalLine && depth > 0)
-                    _buildNodeIndentLines(depth, parentIsLastList, isLast),
-                  // 展开/折叠图标
-                  hasChildren
-                      ? Icon(
-                          (e['open'] ?? false)
-                              ? Icons.keyboard_arrow_down_rounded
-                              : (widget.isRTL
-                                    ? Icons.keyboard_arrow_left_rounded
-                                    : Icons.keyboard_arrow_right_rounded),
-                          size: 20,
-                        )
-                      : SizedBox(width: 20),
-                  SizedBox(width: 5),
-                  GestureDetector(
-                    onTap: () {
-                      selectCheckedBox(e);
-                    },
-                    child: buildCheckBoxIcon(e),
+                  Row(
+                    textDirection: widget.isRTL
+                        ? TextDirection.rtl
+                        : TextDirection.ltr,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // 绘制层级连接线
+                      if (lineStyle.showVerticalLine && depth > 0)
+                        _buildNodeIndentLines(depth, parentIsLastList, isLast),
+                      // 展开/折叠图标
+                      hasChildren
+                          ? Icon(
+                              (e['open'] ?? false)
+                                  ? Icons.keyboard_arrow_down_rounded
+                                  : (widget.isRTL
+                                        ? Icons.keyboard_arrow_left_rounded
+                                        : Icons.keyboard_arrow_right_rounded),
+                              size: 20,
+                            )
+                          : SizedBox(width: 20),
+                      SizedBox(width: 5),
+                      GestureDetector(
+                        onTap: () {
+                          selectCheckedBox(e);
+                        },
+                        child: buildCheckBoxIcon(e),
+                      ),
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: _isLeafNode(e)
+                            ? Draggable<Map<String, dynamic>>(
+                                data: e,
+                                feedback: Material(
+                                  color: Colors.transparent,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: const Color(0xFF90CAF9),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${e[widget.config.label]}',
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                ),
+                                childWhenDragging: Opacity(
+                                  opacity: 0.4,
+                                  child: Text(
+                                    '${e[widget.config.label]}',
+                                    textAlign: widget.isRTL
+                                        ? TextAlign.end
+                                        : TextAlign.start,
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                                child: Text(
+                                  '${e[widget.config.label]}',
+                                  textAlign: widget.isRTL
+                                      ? TextAlign.end
+                                      : TextAlign.start,
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              )
+                            : Text(
+                                '${e[widget.config.label]}',
+                                textAlign: widget.isRTL
+                                    ? TextAlign.end
+                                    : TextAlign.start,
+                                style: TextStyle(fontSize: 16),
+                              ),
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 5),
-                  Expanded(
-                    child: Text(
-                      '${e[widget.config.label]}',
-                      textAlign: widget.isRTL ? TextAlign.end : TextAlign.start,
-                      style: TextStyle(fontSize: 16),
+                  if (e['open'] ?? false)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: buildTreeNode(
+                        e,
+                        depth: depth + 1,
+                        parentIsLastList: currentParentList,
+                      ),
                     ),
-                  ),
                 ],
               ),
-              if (e['open'] ?? false)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: buildTreeNode(
-                    e,
-                    depth: depth + 1,
-                    parentIsLastList: currentParentList,
-                  ),
-                ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       );
     }).toList();
   }
